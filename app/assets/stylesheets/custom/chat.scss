@@ -41,13 +41,27 @@
   border-right: 1px solid rgba(0,0,0,.12);
 }
 
+@media screen and (max-width: 767px) {
+  .NavBarAdmin.sidebar, .NavBarProfile.sidebar {
+    width: 70px;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .NavBarAdmin.sidebar, .NavBarProfile.sidebar {
+    width: 50px;
+  }
+}
+
 @media screen and (max-width: 991px) and (min-width: 0px) {
   .contacts {
     width: 100%;
+    height: calc(100vh - 90px) !important;
   }
 
   .message_board {
     display: none;
+    height: calc(100vh - 90px) !important;
   }
 
   .customer_detail {
@@ -112,7 +126,7 @@ html[dir="rtl"] {
 
 .nv-tabs {
   display: flex;
-  border-bottom: 1px solid #c9c9c9;
+  border-bottom: 1px solid rgba(0,0,0,.12);
   cursor: pointer;
 }
 
@@ -143,7 +157,7 @@ html[dir="rtl"] {
 .nv-item {
   align-items: center;
   color: #5d5d5d;
-  border-bottom: 1px solid #c9c9c9;
+  border-bottom: 1px solid rgba(0,0,0,.12);
   padding: 0;
 }
 
@@ -151,7 +165,7 @@ html[dir="rtl"] {
   background: #dcdcdc;
   color: #333;
   position: relative;
-  border-bottom: 1px solid #c9c9c9;
+  border-bottom: 1px solid rgba(0,0,0,.12);
 }
 
 .nv-item > a {
@@ -214,13 +228,14 @@ html[dir="rtl"] {
   padding: 20px;
   color: black;
   background: white;
-  border-bottom: 1px solid #c9c9c9;
+  border-bottom: 1px solid rgba(0,0,0,.12);
   height: 64px;
 }
 
 .nv-message-board-header .nv-customer-name {
   float:left;
   width: 30%;
+  text-align: left;
 }
 
 .nv-message-board-header .nv-back-contacts {
@@ -443,7 +458,7 @@ html[dir="rtl"] {
   margin: 0;
   padding: 20px;
   overflow-y: auto;
-//height: calc(100% - 64px - 66px);
+  //height: calc(100% - 64px - 66px);
   height: 100%;
 }
 
@@ -522,12 +537,18 @@ html[dir="rtl"] {
   float: left;
   background: white;
   height: 100vh;
-  border-left: 1px solid #c9c9c9;
+  border-left: 1px solid rgba(0,0,0,.12);
 }
 .nv-customer-header {
   min-height: 80px;
   flex: 0 0 auto;
   padding: 16px 24px !important;
+}
+.nv-customer-header .nv-back-messages {
+  float: left;
+  display: none;
+  padding-top: 10px;
+  padding-right: 20px;
 }
 .nv-customer-header .nv-customer-title {
   font-size: 16px;

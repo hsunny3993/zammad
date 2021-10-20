@@ -2454,8 +2454,8 @@ input.has-error {
     .navigation:hover ~ &,
     .navigation.is-hovered ~ &,
     .navigation:active ~ & {
-      transform: translateX(#{$mobileNavigationWidthOpen - $mobileNavigationWidth});
-      @include rtl(transform, translateX(-#{$mobileNavigationWidthOpen - $mobileNavigationWidth}));
+      //transform: translateX(#{$mobileNavigationWidthOpen - $mobileNavigationWidth});
+      //@include rtl(transform, translateX(-#{$mobileNavigationWidthOpen - $mobileNavigationWidth}));
     }
   }
 }
@@ -4037,7 +4037,7 @@ footer {
     &:hover,
     &:active,
     &.is-hovered {
-      width: $mobileNavigationWidthOpen;
+      //width: $mobileNavigationWidthOpen;
 
       .menu-item-name {
         display: block;

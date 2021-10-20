@@ -36,12 +36,13 @@ $navigationWidth: 100px;
 @media screen and (max-width: 991px) and (min-width: 0px) {
   .navigation {
     position: fixed;
-    height: 50px;
+    height: 45px;
     width: 100%;
     z-index: 4;
     display: flex;
     bottom: 0px;
     left: 0px;
+    overflow: hidden;
   }
   .navbar-items-personal {
     display: flex;
@@ -60,6 +61,7 @@ $navigationWidth: 100px;
   }
   #app div.content.horizontal {
     margin-top: 50px;
+    margin-bottom: 50px;
     margin-left: 0 !important;
   }
 }
