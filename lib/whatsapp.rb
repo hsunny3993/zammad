@@ -303,7 +303,7 @@ returns
       },
       created_by_id: 1,
       updated_by_id: 1
-    )
+      )
     ticket.save!
     ticket
   end

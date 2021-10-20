@@ -41,7 +41,6 @@ class CommunicateWhatsappJob < ApplicationJob
       }
 
       response = conn.post("https://waba.360dialog.io/v1/messages", data.to_json)
-      # response = conn.post("https://waba-sandbox.360dialog.io/v1/messages", data.to_json)
       if response.status != 201
         raise Exceptions::UnprocessableEntity, 'Unable to send reply message.'
       end

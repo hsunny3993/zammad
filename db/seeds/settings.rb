@@ -110,7 +110,7 @@ Setting.create_if_not_exists(
     placeholder: true,
     permission:  ['admin.branding'],
   },
-  state:       'Zammad Helpdesk',
+  state:       'Voipe Helpdesk',
   frontend:    true
 )
 Setting.create_if_not_exists(
@@ -2983,7 +2983,7 @@ Setting.create_if_not_exists(
   area:        'Core',
   description: 'Defines the default screen.',
   options:     {},
-  state:       '#dashboard',
+  state:       '#messages',
   frontend:    true
 )
 

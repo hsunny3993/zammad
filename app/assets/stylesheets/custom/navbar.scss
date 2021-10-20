@@ -1,0 +1,65 @@
+$navigationWidth: 100px;
+
+.navigation {
+  width: $navigationWidth;
+}
+
+.user-menu {
+  display: block;
+}
+
+.search .logo {
+  margin: -4px 10px 0 18px;
+  width: fit-content;
+}
+
+.user-menu .dropdown-menu {
+  width: 150px;
+  top: 120px;
+  height: 300px;
+}
+
+.dropdown-nose {
+  top: 55px;
+}
+
+.fas {
+  font-size: 20px;
+  color: #4d4d4d;
+}
+
+@media screen and (min-width: 992px) {
+  .navigation {
+    position: relative;
+  }
+}
+@media screen and (max-width: 991px) and (min-width: 0px) {
+  .navigation {
+    position: fixed;
+    height: 50px;
+    width: 100%;
+    z-index: 4;
+    display: flex;
+    bottom: 0px;
+    left: 0px;
+  }
+  .navbar-items-personal {
+    display: flex;
+  }
+  .user-menu {
+    flex-direction: unset !important;
+    width: 100%;
+  }
+  .search {
+    padding: 10px 5px 5px;
+    display: block;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: 50px;
+  }
+  #app div.content.horizontal {
+    margin-top: 50px;
+    margin-left: 0 !important;
+  }
+}
