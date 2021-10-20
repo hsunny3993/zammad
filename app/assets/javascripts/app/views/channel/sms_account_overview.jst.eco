@@ -36,9 +36,9 @@
           <tr>
             <td><%- @T('Adapter') %>
             <td><%= channel.options.adapter %>
-          <tr>
+          <!--<tr>
             <td><%- @T('Webhook') %>
-            <td><%= @C('http_type') %>://<%= @C('fqdn') %>/api/v1/sms_webhook/<%= channel.options?.webhook_token || '?' %>
+            <td><%= @C('http_type') %>://<%= @C('fqdn') %>/api/v1/sms_webhook/<%= channel.options?.webhook_token || '?' %>-->
           <tr>
             <td><%- @T('Account') %>
             <td><%= channel.options.account_id %>

@@ -149,7 +149,7 @@ class App.Messages extends App.Controller
                           #{ticket.customer.firstname} #{ticket.customer.lastname}
                           <i class="badge-icon badge-new">#{Object.keys(data.assets.TicketArticle).length}</i>
                         </span>
-                        <span class="nv-item-time">#{@T(formattedDateTime(lastArticle.updated_at))}</span>
+                        <span class="nv-item-time">#{@T(@formattedDateTime(lastArticle.updated_at))}</span>
                       </div>
                       <div class="nv-recent-message">
                         <span class="nv-recent-msg">#{content}</span>
@@ -755,6 +755,22 @@ class App.Messages extends App.Controller
               'subtype': '',
               'ticket_id': ticketId,
               'to': customer.email,
+              'type_id': @channelType,
+            }
+          else if articleTypeId == 2
+            article = {
+              'body': msg,
+              'cc': '',
+              'content_type': 'text/plain',
+              'form_id': '',
+              'from': "#{owner.firstname} #{owner.lastname}",
+              'in_reply_to': '',
+              'internal': false,
+              'sender_id': ticket.owner_id,
+              'subject': '',
+              'subtype': '',
+              'ticket_id': ticketId,
+              'to': customer.mobile,
               'type_id': @channelType,
             }
           else
