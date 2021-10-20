@@ -15,6 +15,7 @@ class Ticket::Article < ApplicationModel
   include Ticket::Article::EnqueueCommunicateFacebookJob
   include Ticket::Article::EnqueueCommunicateSmsJob
   include Ticket::Article::EnqueueCommunicateTelegramJob
+  include Ticket::Article::EnqueueCommunicateWhatsappJob
   include Ticket::Article::EnqueueCommunicateTwitterJob
   include Ticket::Article::HasTicketContactAttributesImpact
   include Ticket::Article::ResetsTicketState

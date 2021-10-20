@@ -16,6 +16,7 @@ module ChecksPerformValidation
       'article.note'         => %w[body subject internal],
       'notification.email'   => %w[body recipient subject],
       'notification.sms'     => %w[body recipient],
+      'notification.whatsapp'=> %w[body recipient],
       'notification.webhook' => %w[webhook_id],
     }
 

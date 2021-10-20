@@ -29,6 +29,7 @@ class CreateBase < ActiveRecord::Migration[4.2]
       t.string :phone,                limit: 100, null: true, default: ''
       t.string :fax,                  limit: 100, null: true, default: ''
       t.string :mobile,               limit: 100, null: true, default: ''
+      t.string :whatsapp_mobile,      limit: 100, null: true, default: ''
       t.string :department,           limit: 200, null: true, default: ''
       t.string :street,               limit: 120, null: true, default: ''
       t.string :zip,                  limit: 100, null: true, default: ''

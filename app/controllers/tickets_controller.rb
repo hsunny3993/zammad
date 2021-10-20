@@ -22,7 +22,16 @@ class TicketsController < ApplicationController
     if response_expand?
       list = []
       tickets.each do |ticket|
-        list.push ticket.attributes_with_association_names
+        ticket_info = ticket.attributes_with_association_names
+
+        last_article = nil
+        if ticket.articles.length() > 0
+          last_article = ticket.articles[ticket.articles.length() -1].attributes_with_association_names
+        end
+
+        ticket_info[:last_article] = last_article
+
+        list.push ticket_info
       end
       render json: list, status: :ok
       return

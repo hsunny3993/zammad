@@ -23,6 +23,7 @@ class App.UiElement.ticket_perform_action
         if groupKey is 'notification'
           elements["#{groupKey}.email"] = { name: 'email', display: 'Email' }
           elements["#{groupKey}.sms"] = { name: 'sms', display: 'SMS' }
+          elements["#{groupKey}.whatsapp"] = { name: 'whatsapp', display: 'WhatsApp' }
           elements["#{groupKey}.webhook"] = { name: 'webhook', display: 'Webhook' }
         else if groupKey is 'article'
           elements["#{groupKey}.note"] = { name: 'note', display: 'Note' }
@@ -367,6 +368,9 @@ class App.UiElement.ticket_perform_action
       'ticket_customer': 'Customer'
       'ticket_agents': 'All Agents'
 
+    whatsappOptions =
+      'ticket_customer': 'Customer'
+
     name = "#{attribute.name}::notification.#{notificationType}"
 
     messageLength = switch notificationType
@@ -384,6 +388,56 @@ class App.UiElement.ticket_perform_action
         if key is recipient
           selected = true
       columnSelectOptions.push({ value: key, name: App.i18n.translatePlain(value), selected: selected })
+
+    # In whatsapp case
+    columnWhatsappSelectOptions = []
+    for key, value of whatsappOptions
+      selected = undefined
+      for recipient in meta.recipient
+        if key is recipient
+          selected = true
+      columnWhatsappSelectOptions.push({ value: key, name: App.i18n.translatePlain(value), selected: selected })
+
+    columnWhatsappSelectRecipientUserOptions = []
+    for user in App.User.all()
+      key = "userid_#{user.id}"
+      isCustomer = user.permission('ticket.customer')
+      selected = undefined
+      for recipient in meta.recipient
+        if key is recipient
+          selected = true
+      if isCustomer
+        columnWhatsappSelectRecipientUserOptions.push({ value: key, name: "#{user.firstname} #{user.lastname}", selected: selected })
+
+    # In whatsapp trigger case, removes variable section for choosing recipient
+    if notificationType is 'whatsapp'
+      columnSelectRecipient = new App.ColumnSelect
+        attribute:
+          name:    "#{name}::recipient"
+          options: [
+            {
+              label: 'Variables',
+              group: columnWhatsappSelectOptions
+            },
+            {
+              label: 'User',
+              group: columnWhatsappSelectRecipientUserOptions
+            },
+          ]
+    else
+      columnSelectRecipient = new App.ColumnSelect
+        attribute:
+          name:    "#{name}::recipient"
+          options: [
+            {
+              label: 'Variables',
+              group: columnSelectOptions
+            },
+            {
+              label: 'User',
+              group: columnSelectRecipientUserOptions
+            },
+          ]
 
     columnSelectRecipientUserOptions = []
     for user in App.User.all()
@@ -436,6 +490,52 @@ class App.UiElement.ticket_perform_action
 
       notificationElement.find('.js-webhooks').html(webhookSelection)
 
+    else if notificationType is 'whatsapp'
+      notificationElement = $( App.view('generic/ticket_perform_action/notification')(
+        attribute: attribute
+        name: name
+        notificationType: notificationType
+        meta: meta || {}
+      ))
+
+      notificationElement.find('.js-recipient select').replaceWith(selectionRecipient)
+
+      visibilitySelection = App.UiElement.select.render(
+        name: "#{name}::internal"
+        multiple: false
+        null: false
+        options: { true: 'internal', false: 'public' }
+        value: meta.internal || 'false'
+        translate: true
+      )
+
+      notificationElement.find('.js-internal').html(visibilitySelection)
+
+      notificationElement.find('.js-body div[contenteditable="true"]').ce(
+        mode: 'richtext'
+        placeholder: 'message'
+        maxlength: messageLength
+      )
+      new App.WidgetPlaceholder(
+        el: notificationElement.find('.js-body div[contenteditable="true"]').parent()
+        objects: [
+          {
+            prefix: 'ticket'
+            object: 'Ticket'
+            display: 'Ticket'
+          },
+          {
+            prefix: 'article'
+            object: 'TicketArticle'
+            display: 'Article'
+          },
+          {
+            prefix: 'user'
+            object: 'User'
+            display: 'Current User'
+          },
+        ]
+      )
     else
       notificationElement = $( App.view('generic/ticket_perform_action/notification')(
         attribute: attribute

@@ -149,6 +149,12 @@ gem 'viewpoint', require: false
 # integrations - S/MIME
 gem 'openssl'
 
+# faraday
+gem 'faraday'
+
+# whenever
+gem 'whenever', require: false
+
 # Gems used only for develop/test and not required
 # in production environments by default.
 group :development, :test do

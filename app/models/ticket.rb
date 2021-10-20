@@ -1117,6 +1117,9 @@ perform changes on ticket
       when 'notification.sms'
         send_sms_notification(value, article, perform_origin)
         next
+      when 'notification.whatsapp'
+        send_whatsapp_notification(value, article, perform_origin)
+        next
       when 'notification.email'
         send_email_notification(value, article, perform_origin)
       when 'notification.webhook'

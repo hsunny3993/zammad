@@ -1,0 +1,31 @@
+<div class="alert alert--danger hidden" role="alert"></div>
+<fieldset>
+  <h2><%- @T('Bot Name') %></h2>
+  <div class="input form-group">
+    <div class="formGroup-label">
+      <label for="bot_name"><%- "Input your bot name" %> <span>*</span></label>
+    </div>
+    <div class="controls">
+      <input id="bot_name" type="text" name="bot_name" value="<%= @channel.options.bot_name %>" class="form-control" required autocomplete="off">
+    </div>
+  </div>
+
+  <h2><%- @T('Settings') %></h2>
+  <div class="input form-group">
+    <div class="formGroup-label">
+      <label for="phone_number"><%- "Verified WhatsApp number" %> <span>*</span></label>
+    </div>
+    <div class="controls">
+      <input id="phone_number" type="text" name="phone_number" value="<%= @channel.options.phone_number %>" placeholder="<%- @Ti('Add WhatsApp number here e.g your 634481991') %>" class="form-control" required autocomplete="off">
+    </div>
+  </div>
+  <div class="input form-group">
+    <div class="formGroup-label">
+      <label for="api_token"><%- "Input WhatsApp Api Token" %> <span>*</span></label>
+    </div>
+    <div class="controls">
+      <input id="api_token" type="text" name="api_token" value="<%= @channel.options.api_token %>" class="form-control" required autocomplete="off">
+    </div>
+  </div>
+
+</fieldset>

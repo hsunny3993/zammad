@@ -39,7 +39,8 @@ Rails.application.config.content_security_policy do |policy|
   policy.object_src  :none
   policy.script_src  :self, :unsafe_eval, :strict_dynamic
   policy.style_src   :self, :unsafe_inline
-  policy.frame_src   'www.youtube.com', 'player.vimeo.com'
+  policy.media_src   :self, :data
+  policy.frame_src   'www.youtube.com', 'player.vimeo.com', '192.168.2.126:3000', 'zmd4.voipe.cc'
 end
 
 # If you are using UJS then enable automatic nonce generation

@@ -1,0 +1,36 @@
+<div class="alert alert--danger hidden" role="alert"></div>
+<p>
+  <%- @T('The tutorial on how to manage a %s is hosted on our online documentation %l.', 'Whatsapp Bot', 'https://admin-docs.zammad.org/en/latest/channels/whatsapp.html') %>
+</p>
+<fieldset>
+  <h2><%- @T('Get a 360dialog account and activate it') %></h2>
+  <br>
+  <h2><%- @T("Bot Name") %></h2>
+  <div class="input form-group">
+    <div class="formGroup-label">''
+      <label for="bot_name"><%- @T("Input your WhatsApp Bot's name") %> <span>*</span></label>
+    </div>
+    <div class="controls">
+      <input id="bot_name" type="text" name="bot_name" value="" placeholder="<%- @Ti('Voipe Bot') %>" class="form-control" required autocomplete="off">
+    </div>
+  </div>
+  <br>
+  <h2><%- @T('Settings') %></h2>
+  <div class="input form-group">
+    <div class="formGroup-label">''
+      <label for="phone_number"><%- @T('Add verified whatsapp phone number') %> <span>*</span></label>
+    </div>
+    <div class="controls">
+      <input id="phone_number" type="text" name="phone_number" value="" placeholder="<%- @Ti('Add whatsapp number here e.g 5446900911') %>" class="form-control" required autocomplete="off">
+    </div>
+  </div>
+  <h2><%- @T('Generate API keys and add it below', 'Whatsapp') %></h2>
+  <div class="input form-group">
+    <div class="formGroup-label">
+      <label for="api_token"><%- @T('%s Api Token', 'Whatsapp') %> <span>*</span></label>
+    </div>
+    <div class="controls">
+      <input id="api_token" type="text" name="api_token" value="" placeholder="<%- @Ti('Add API key here, e.g Be6fut8UTxUr0KmI0Y3dttHVAK') %>" class="form-control" required autocomplete="off">
+    </div>
+  </div>
+</fieldset>

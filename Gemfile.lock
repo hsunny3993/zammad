@@ -135,6 +135,7 @@ GEM
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
     childprocess (3.0.0)
+    chronic (0.10.2)
     chunky_png (1.4.0)
     clavius (1.0.4)
     clearbit (0.3.3)
@@ -637,6 +638,8 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    whenever (1.0.0)
+      chronic (>= 0.6.3)
     writeexcel (1.0.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
@@ -686,6 +689,7 @@ DEPENDENCIES
   execjs
   factory_bot_rails
   faker
+  faraday
   github_changelog_generator
   gmail_xoauth
   guard
@@ -762,6 +766,7 @@ DEPENDENCIES
   vcr
   viewpoint
   webmock
+  whenever
   writeexcel
   zendesk_api
 
@@ -769,4 +774,4 @@ RUBY VERSION
    ruby 2.7.4p191
 
 BUNDLED WITH
-   2.2.20
+   2.2.29

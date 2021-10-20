@@ -355,7 +355,7 @@ Setting.create_if_not_exists(
       },
     ],
   },
-  state:       'DB',
+  state:       'File',
   preferences: {
     controller:             'SettingsAreaStorageProvider',
     online_service_disable: true,

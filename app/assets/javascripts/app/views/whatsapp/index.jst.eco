@@ -1,0 +1,49 @@
+<div class="page-header">
+  <div class="page-header-title">
+    <h1><%- @T('WhatsApp') %> <small><%- @T('Bots') %></small></h1>
+  </div>
+
+  <div class="page-header-meta">
+    <a class="btn btn--success js-new"><%- @T('Add WhatsApp') %></a>
+  </div>
+</div>
+
+<div class="page-content">
+<% if _.isEmpty(@channels): %>
+  <div class="page-description">
+    <p><%- @T('You have no configured %s right now.', 'WhatsApp Bot') %></p>
+  </div>
+  <a class="btn btn--primary" style="position: absolute; left: 13px; bottom: 9px;" href="https://api.whatsapp.com/send?phone=381644670691" target="_blank"><%- @T('Open WhatsApp') %></a>
+
+<% else: %>
+
+<% for channel in @channels: %>
+  <div class="action <% if channel.active isnt true: %>is-inactive<% end %>" data-id="<%= channel.id %>">
+    <div class="action-block action-row">
+      <h2><%- @Icon('status', 'supergood-color inline') %> <%= channel.options.bot_name %></h2>
+    </div>
+    <div class="action-flow action-flow--row">
+      <div class="action-block">
+        <h3><%- @T('Phone Number') %></h3>
+        <%= channel.options.phone_number %>
+      </div>
+      <%- @Icon('arrow-right', 'action-flow-icon') %>
+      <div class="action-block">
+        <h3><%- @T('Token') %></h3>
+        <% if channel.options: %>
+          <%= channel.options.api_token %>
+        <% end %>
+      </div>
+    </div>
+    <div class="action-controls">
+      <div class="btn btn--danger btn--secondary js-delete"><%- @T('Delete') %></div>
+      <% if channel.active is true: %>
+        <div class="btn btn--secondary js-disable"><%- @T('Disable') %></div>
+      <% else: %>
+        <div class="btn btn--secondary js-enable"><%- @T('Enable') %></div>
+      <% end %>
+      <div class="btn js-edit"><%- @T('Edit') %></div>
+    </div>
+  </div>
+<% end %>
+</div>
