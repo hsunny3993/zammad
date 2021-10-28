@@ -48,7 +48,6 @@ returns
     }
 
     response = conn.post("https://waba.360dialog.io/v1/configs/webhook", data.to_json)
-    # response = conn.post("https://waba-sandbox.360dialog.io/v1/configs/webhook", data.to_json)
     if response.status != 200
       raise Exceptions::UnprocessableEntity, 'Unable to set webhook at Whatsapp, seems to be a invalid url.'
     end
@@ -77,8 +76,8 @@ returns
 
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    callback_url = "https://zmd4.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://fb2fb546121d.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    callback_url = "https://dd9e-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -276,7 +275,7 @@ returns
     # find ticket or create one
     state_ids        = Ticket::State.where(name: %w[closed merged removed]).pluck(:id)
     possible_tickets = Ticket.where(customer_id: user.id).where.not(state_id: state_ids).order(:updated_at)
-    ticket           = possible_tickets.find_each.find { |possible_ticket| possible_ticket.preferences[:channel_id] == channel.id }
+    ticket           = possible_tickets.find_each.find { |possible_ticket| possible_ticket.preferences[:channel_id].to_i == channel.id }
 
     if ticket
       # check if title need to be updated

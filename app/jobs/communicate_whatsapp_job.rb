@@ -17,7 +17,6 @@ class CommunicateWhatsappJob < ApplicationJob
 
     channel = Channel.lookup(id: ticket.preferences['channel_id'])
     log_error(article, "No such channel for channel id #{ticket.preferences['channel_id']}") if !channel
-    #log_error(article, "Channel.find(#{channel.id}) isn't a whatsapp channel!") if channel.options[:adapter] !~ /\Awhatsapp/i
     log_error(article, "Channel.find(#{channel.id}) has not whatsapp api token!") if channel.options[:api_token].blank?
 
     begin
@@ -117,7 +116,6 @@ class CommunicateWhatsappJob < ApplicationJob
         end
 
         response = conn.post("https://waba.360dialog.io/v1/messages", data.to_json)
-        # response = conn.post("https://waba-sandbox.360dialog.io/v1/messages", data.to_json)
         if response.status != 201
           raise Exceptions::UnprocessableEntity, 'Unable to send reply message.'
         end

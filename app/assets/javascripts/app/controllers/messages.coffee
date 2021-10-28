@@ -817,6 +817,9 @@ class App.Messages extends App.Controller
             before: =>
               $("li[data-ticket-id=#{ticketId}] span.nv-contact-name i").remove()
             success: (data) =>
+              new_state_id = data['assets']['Ticket'][data.ticket_id]['state_id']
+              @tickets[ticketId].state_id = new_state_id
+
               $(".emojionearea-editor").text("")
               $("#email-body").val("")
             error: =>
