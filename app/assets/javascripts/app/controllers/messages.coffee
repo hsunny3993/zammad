@@ -661,6 +661,10 @@ class App.Messages extends App.Controller
             alert(@T('This ticket was closed.'))
             return
 
+          ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+          customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
+          ticket = @tickets[ticketId]
+
           agent_name = $("input[name='agent']:checked").parent().text()
           agent_id = $("input[name='agent']:checked").val()
           $('.js-value').attr("data-agent-id", agent_id)
