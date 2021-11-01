@@ -745,16 +745,18 @@ class App.Messages extends App.Controller
           if customer == null || typeof customer == "undefined"
             customer = App.User.find(ticket.customer_id)
 
+          currentUser = App.Session.get();
+
           if articleTypeId == 1
             article = {
               'body': msg,
               'cc': '',
               'content_type': 'text/plain',
               'form_id': '',
-              'from': "#{owner.firstname} #{owner.lastname}",
+              'from': "#{currentUser.firstname} #{currentUser.lastname}",
               'in_reply_to': '',
               'internal': false,
-              'sender_id': ticket.owner_id,
+              'sender_id': 1,
               'subject': '',
               'subtype': '',
               'ticket_id': ticketId,
@@ -767,10 +769,10 @@ class App.Messages extends App.Controller
               'cc': '',
               'content_type': 'text/plain',
               'form_id': '',
-              'from': "#{owner.firstname} #{owner.lastname}",
+              'from': "#{currentUser.firstname} #{currentUser.lastname}",
               'in_reply_to': '',
               'internal': false,
-              'sender_id': ticket.owner_id,
+              'sender_id': 1,
               'subject': '',
               'subtype': '',
               'ticket_id': ticketId,
@@ -783,10 +785,10 @@ class App.Messages extends App.Controller
               'cc': '',
               'content_type': 'text/plain',
               'form_id': '',
-              'from': "#{owner.firstname} #{owner.lastname}",
+              'from': "#{currentUser.firstname} #{currentUser.lastname}",
               'in_reply_to': '',
               'internal': false,
-              'sender_id': ticket.owner_id,
+              'sender_id': 1,
               'subject': '',
               'subtype': '',
               'ticket_id': ticketId,
