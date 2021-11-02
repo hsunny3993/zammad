@@ -29,7 +29,7 @@ class DefaultRouter extends App.Controller
       @navigate @Config.get('default_controller'), { hideCurrentLocationFromHistory: true }
       return
 
-    @navigate '#dashboard', { hideCurrentLocationFromHistory: true }
+    @navigate '#messages', { hideCurrentLocationFromHistory: true }
 
 App.Config.set('', DefaultRouter, 'Routes')
 App.Config.set('/', DefaultRouter, 'Routes')

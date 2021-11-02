@@ -16,7 +16,7 @@ $low-priority-color: hsl(200,68%,73%);
 
 $minWidth: 1024px;
 $sidebarWidth: 280px;
-$navigationWidth: 260px;
+$navigationWidth: 100px;
 $mobileNavigationWidth: 50px;
 $mobileNavigationWidthOpen: 220px;
 
@@ -2454,8 +2454,8 @@ input.has-error {
     .navigation:hover ~ &,
     .navigation.is-hovered ~ &,
     .navigation:active ~ & {
-      transform: translateX(#{$mobileNavigationWidthOpen - $mobileNavigationWidth});
-      @include rtl(transform, translateX(-#{$mobileNavigationWidthOpen - $mobileNavigationWidth}));
+      //transform: translateX(#{$mobileNavigationWidthOpen - $mobileNavigationWidth});
+      //@include rtl(transform, translateX(-#{$mobileNavigationWidthOpen - $mobileNavigationWidth}));
     }
   }
 }
@@ -4022,7 +4022,7 @@ footer {
   @include phone {
     position: absolute;
     @include bidi-style(left, 0, right, auto);
-    top: 0;
+    /*top: 0;*/
     left: 0;
     width: $mobileNavigationWidth;
     height: 100%;
@@ -4037,7 +4037,7 @@ footer {
     &:hover,
     &:active,
     &.is-hovered {
-      width: $mobileNavigationWidthOpen;
+      //width: $mobileNavigationWidthOpen;
 
       .menu-item-name {
         display: block;

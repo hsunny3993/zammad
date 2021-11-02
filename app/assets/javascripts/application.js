@@ -42,6 +42,9 @@
 //= require ./app/lib/rangy/rangy-textrange.js
 //= require ./app/lib/rangy/rangy-highlighter.js
 
+//= require ./app/lib/emojionearea/emojionearea.js
+//= require ./app/lib/dropzone/dropzone.js
+
 //= require_tree ./app/lib/base
 
 //= require ./app/index.coffee

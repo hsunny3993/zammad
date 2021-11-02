@@ -134,9 +134,10 @@ module Zammad
     }
 
     config.hosts = [
-      IPAddr.new("0.0.0.0/0"), # All IPv4 addresses.
-      IPAddr.new("::/0"),      # All IPv6 addresses.
-      "localhost"              # The localhost reserved domain.
+      IPAddr.new("0.0.0.0/0"),        # All IPv4 addresses.
+      IPAddr.new("::/0"),             # All IPv6 addresses.
+      "localhost",                         # The localhost reserved domain.
+      "zmd5.voipe.cc",                     # The zmd5.voipe.cc reserved domain.
     ]
   end
 end

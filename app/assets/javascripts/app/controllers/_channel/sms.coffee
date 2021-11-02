@@ -194,15 +194,19 @@ class ChannelSmsAccount extends App.ControllerModal
           @channel.options.webhook_token = localCurrentConfig.default
 
     webhook = "#{@Config.get('http_type')}://#{@Config.get('fqdn')}/api/v1/sms_webhook/#{@channel.options?.webhook_token}"
-    new App.ControllerForm(
-      el: el.find('.js-channelWebhook')
-      model:
-        configure_attributes: [
-          { name: 'options::webhook', display: 'Webhook', tag: 'input', type: 'text', limit: 200, null: false, default: webhook, disabled: true },
-        ]
-        className: ''
-      params: @channel
-    )
+    if adapter is 'sms/voipe'
+      el.find('.js-channelWebhook').hide()
+    else
+      el.find('.js-channelWebhook').show()
+      new App.ControllerForm(
+        el: el.find('.js-channelWebhook')
+        model:
+          configure_attributes: [
+            { name: 'options::webhook', display: 'Webhook', tag: 'input', type: 'text', limit: 200, null: false, default: webhook, disabled: true },
+          ]
+          className: ''
+        params: @channel
+      )
 
     new App.ControllerForm(
       el: el.find('.js-channelAdapterOptions')

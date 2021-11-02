@@ -1,0 +1,160 @@
+<div class="container">
+  <div class="row">
+    <div class="contacts">
+      <!--<div class="nv-search">
+        <input id="nv-contact-search" type="text" class="form-control" placeholder="Search">
+      </div>-->
+
+      <div class="nv-tabs">
+        <% if @isAdmin: %>
+        <div class="nv-tab nv-tab-active" data-tab-type="all">
+          <span><%= @T('All') %></span>
+        </div>
+        <div class="nv-tab" data-tab-type="mine">
+          <span><%= @T('Mine') %></span>
+        </div>
+        <% else: %>
+        <div class="nv-tab nv-tab-active">
+          <span><%= @T('All') %></span>
+        </div>
+        <% end %>
+      </div>
+
+      <div class="nv-contacts-body nv-scrollable" data-auto-height="" style="overflow-y: auto; padding: 0px;">
+        <div class="jspContainer">
+          <div class="jspPane" style="padding: 0px; top: 0px;">
+            <ul class="nv-items">
+              <% idx = 0 %>
+              <% for key in Object.keys(@tickets): %>
+                <% if idx == 0: %>
+                <li class="nv-item nv-item-active" data-ticket-id="<%= @tickets[key].id %>" data-customer-id="<%= @tickets[key].customer_id %>" data-article-type-id="<%= @tickets[key].create_article_type_id %>" <% if @me == @tickets[key].owner_id: %>data-mine="mine"<% end %>>
+                <% else: %>
+                <li class="nv-item" data-ticket-id="<%= @tickets[key].id %>" data-customer-id="<%= @tickets[key].customer_id %>" data-article-type-id="<%= @tickets[key].create_article_type_id %>" <% if @me == @tickets[key].owner_id: %>data-mine="mine"<% end %>>
+                <% end %>
+                  <a href="#">
+                    <span class="nv-item-avatar" id="avatar-<%= @tickets[key].id %>"></span>
+                    <div class="nv-body">
+                      <div class="nv-name">
+                        <span class="nv-item-time"><%= @tickets[key].last_article.formattedTime %></span>
+                        <span class="nv-contact-name">
+                          <%= @tickets[key].customer.firstname + ' ' + @tickets[key].customer.lastname %>
+                        </span>
+                      </div>
+                      <div class="nv-recent-message">
+                        <span class="nv-recent-msg"><%= if @tickets[key].last_article then @tickets[key].last_article.body else "" %></span>
+                        <span class="nv-options">
+                          <i class="badge-icon <%= @tickets[key].badge %>"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                <% idx++ %>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message_board" style="display: none;">
+      <div class="nv-message-board-header">
+        <div class="nv-back-contacts">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <% if @isAdmin: %>
+          <div class="nv-customer-name"></div>
+          <div class="nv-ticket-action" dir="ltr">
+            <div class="dropp">
+              <div class="dropp-header">
+                <span class="dropp-header__title js-value"><%= @T('Choose an agent') %></span>
+                <a href="#" class="dropp-header__btn js-dropp-action"><i class="icon"></i></a>
+              </div>
+              <div class="dropp-body"></div>
+            </div>
+            <a class="btn btn-close-conv"><%= @T('Close') %></a>
+          </div>
+          <div style="clear:both;"></div>
+        <% end %>
+        <div class="nv-go-detail">
+          <i class="fas fa-info-circle"></i>
+        </div>
+      </div>
+      <div class="dropzone">
+        <ul class="nv-histories"></ul>
+      </div>
+      <div class="nv-message-board-footer" style="display: none;">
+        <div id="nv-chat">
+          <textarea id="emoji-area"></textarea>
+          <i class="fas fa-paper-plane send-msg"></i>
+        </div>
+        <div id="nv-chat-email">
+          <!--<div class="form-group">
+            <input type="text" id="to" placeholder="TO" />
+          </div>
+          <div class="form-group">
+            <input type="text" id="cc" placeholder="CC" />
+          </div>-->
+          <div class="form-group" style="margin-right: 26px; margin-bottom: 0;">
+            <textarea type="text" id="email-body" placeholder="<%= @T('Type here') %>"></textarea>
+          </div>
+          <i class="fas fa-paper-plane send-msg" style="margin-top: -45px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="customer_detail" style="display: none;">
+      <div class="nv-customer-header">
+        <div class="nv-back-messages">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <div style="float:left; padding-right: 16px!important;">
+          <span class="nv-avatar nv-customer-avatar"></span>
+        </div>
+        <div class="flex: 0 0 calc(100% - 36px); max-width: calc(100% - 36px);">
+          <div class="nv-customer-title nv-customer-name"></div>
+          <div class="nv-customer-channel">
+          </div>
+        </div>
+      </div>
+
+      <div class="nv-customer-body">
+        <div class="nv-tabs">
+          <div class="nv-tab nv-tab-detail nv-tab-active">
+            <span><%= @T('Detail') %></span>
+          </div>
+          <div class="nv-tab nv-tab-channel">
+            <span><%= @T('Channel') %></span>
+          </div>
+        </div>
+        <div class="nv-customer-info">
+          <div class="nv-customer-info-item">
+            <label for="phone" class="form-label"><%= @T('Phone') %></label>
+            <input type="number" class="form-control" id="phone">
+          </div>
+          <div class="nv-customer-info-item">
+            <label for="email" class="form-label"><%= @T('Email') %></label>
+            <input type="email" class="form-control" id="email">
+          </div>
+          <div class="nv-customer-info-item">
+            <label for="street" class="form-label"><%= @T('Street') %></label>
+            <input type="text" class="form-control" id="street">
+          </div>
+          <div class="nv-customer-info-item">
+            <label for="city" class="form-label"><%= @T('City') %></label>
+            <input type="text" class="form-control" id="city">
+          </div>
+          <div class="nv-customer-info-item">
+            <label for="country" class="form-label"><%= @T('Country') %></label>
+            <input type="text" class="form-control" id="country">
+          </div>
+        </div>
+
+        <div class="nv-customer-channel-info" style="display:none;">
+        </div>
+      </div>
+    </div>
+
+    <div class="tabsSidebar tabsSidebar--attributeBarSpacer vertical"></div>
+  </div>
+</div>
