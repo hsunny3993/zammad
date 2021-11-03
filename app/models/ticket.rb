@@ -1886,4 +1886,49 @@ result
     # blocked for 60 full days
     (user.preferences[:mail_delivery_failed_data].to_date - Time.zone.now.to_date).to_i + 61
   end
+
+  def send_whatsapp_notification(value, article, perform_origin)
+    whatsapp_recipients = build_sms_recipients_list(value, article)
+
+    if whatsapp_recipients.blank?
+      logger.debug "No WhatsApp recipients found for Ticket# #{number}"
+      return
+    end
+
+    whatsapp_recipients_to = whatsapp_recipients
+                               .map { |recipient| "#{recipient.fullname} (#{recipient.mobile})" }
+                               .join(', ')
+
+    channel = Channel.find_by(area: 'WhatsApp::Bot')
+    if !channel.active?
+      # write info message since we have an active trigger
+      logger.info "Found possible WhatsApp recipient(s) (#{whatsapp_recipients_to}) for Ticket# #{number} but WhatsApp channel is not active."
+      return
+    end
+
+    objects = build_notification_template_objects(article)
+    body = NotificationFactory::Renderer.new(
+      objects:  objects,
+      template: value['body'],
+      escape:   false
+    ).render.html2text.tr(' ', ' ') # convert non-breaking space to simple space
+
+    # attributes content_type is not needed for SMS
+    Ticket::Article.create(
+      ticket_id:     id,
+      subject:       'WhatsApp Notification',
+      to:            whatsapp_recipients_to,
+      body:          body,
+      internal:      value['internal'] || false, # default to public if value was not set
+      sender:        Ticket::Article::Sender.find_by(name: 'System'),
+      type:          Ticket::Article::Type.find_by(name: 'whatsapp personal-message'),
+      preferences:   {
+        perform_origin:           perform_origin,
+        whatsapp_recipients:      whatsapp_recipients.map(&:mobile),
+        channel_id:               channel.id,
+      },
+      updated_by_id: 1,
+      created_by_id: 1,
+    )
+  end
 end
