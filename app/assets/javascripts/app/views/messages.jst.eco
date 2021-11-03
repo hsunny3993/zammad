@@ -25,25 +25,25 @@
           <div class="jspPane" style="padding: 0px; top: 0px;">
             <ul class="nv-items">
               <% idx = 0 %>
-              <% for key in Object.keys(@tickets): %>
+              <% for ticket in @tickets: %>
                 <% if idx == 0: %>
-                <li class="nv-item nv-item-active" data-ticket-id="<%= @tickets[key].id %>" data-customer-id="<%= @tickets[key].customer_id %>" data-article-type-id="<%= @tickets[key].create_article_type_id %>" <% if @me == @tickets[key].owner_id: %>data-mine="mine"<% end %>>
+                <li class="nv-item nv-item-active" data-ticket-id="<%= ticket.id %>" data-customer-id="<%= ticket.customer_id %>" data-article-type-id="<%= ticket.create_article_type_id %>" <% if @me == ticket.owner_id: %>data-mine="mine"<% end %>>
                 <% else: %>
-                <li class="nv-item" data-ticket-id="<%= @tickets[key].id %>" data-customer-id="<%= @tickets[key].customer_id %>" data-article-type-id="<%= @tickets[key].create_article_type_id %>" <% if @me == @tickets[key].owner_id: %>data-mine="mine"<% end %>>
+                <li class="nv-item" data-ticket-id="<%= ticket.id %>" data-customer-id="<%= ticket.customer_id %>" data-article-type-id="<%= ticket.create_article_type_id %>" <% if @me == ticket.owner_id: %>data-mine="mine"<% end %>>
                 <% end %>
                   <a href="#">
-                    <span class="nv-item-avatar" id="avatar-<%= @tickets[key].id %>"></span>
+                    <span class="nv-item-avatar" id="avatar-<%= ticket.id %>"></span>
                     <div class="nv-body">
                       <div class="nv-name">
-                        <span class="nv-item-time"><%= @tickets[key].last_article.formattedTime %></span>
+                        <span class="nv-item-time"><%= ticket.last_article.formattedTime %></span>
                         <span class="nv-contact-name">
-                          <%= @tickets[key].customer.firstname + ' ' + @tickets[key].customer.lastname %>
+                          <%= ticket.customer.firstname + ' ' + ticket.customer.lastname %>
                         </span>
                       </div>
                       <div class="nv-recent-message">
-                        <span class="nv-recent-msg"><%= if @tickets[key].last_article then @tickets[key].last_article.body else "" %></span>
+                        <span class="nv-recent-msg"><%= if ticket.last_article then ticket.last_article.body else "" %></span>
                         <span class="nv-options">
-                          <i class="badge-icon <%= @tickets[key].badge %>"></i>
+                          <i class="badge-icon <%= ticket.badge %>"></i>
                         </span>
                       </div>
                     </div>

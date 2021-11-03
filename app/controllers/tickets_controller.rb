@@ -15,7 +15,7 @@ class TicketsController < ApplicationController
     paginate_with(max: 100)
 
     tickets = TicketPolicy::ReadScope.new(current_user).resolve
-                                     .order(id: :asc)
+                                     .order(updated_at: :desc)
                                      .offset(pagination.offset)
                                      .limit(pagination.limit)
 

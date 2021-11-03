@@ -452,6 +452,7 @@ class App.Messages extends App.Controller
           processData: true,
           success: (data) =>
             @tickets = {}
+            tickets = []
             firstTicket = undefined
             id = 1
 
@@ -468,12 +469,13 @@ class App.Messages extends App.Controller
                   ticket.last_article.body = @getShortMsg(ticket.last_article)
                   ticket.last_article.formattedTime = @formattedDateTime(ticket.last_article.updated_at)
                 @tickets[ticket.id] = ticket
+                tickets.push(ticket)
 
                 @ticketIds.push(ticket.id)
                 @ticketArticleIds[ticket.id] = ticket.article_ids
                 id++
 
-            localEl = @renderView(@tickets)
+            localEl = @renderView(tickets)
             @html localEl
 
             for ticket in data
@@ -932,7 +934,7 @@ class App.Messages extends App.Controller
     '#messages'
 
   show: (params) =>
-# incase of being only admin, redirect to admin interface (show no empty white content page)
+    # incase of being only admin, redirect to admin interface (show no empty white content page)
     if !@permissionCheck('ticket.customer') && !@permissionCheck('ticket.agent') && @permissionCheck('admin')
       @navigate '#manage', { hideCurrentLocationFromHistory: true }
       return
