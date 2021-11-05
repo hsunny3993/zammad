@@ -118,8 +118,7 @@ class App.Messages extends App.Controller
             $("li[data-ticket-id=#{ticketIdWithNewArticles}] div.nv-recent-message span.nv-recent-msg").text(content)
 
         else # If the ticket is currently not displayed as active
-
-# Checks if the ticket is new
+          # Checks if the ticket is new
           if ticketIdWithNewArticles not in @ticketIds
             @ticketIds.push(ticketIdWithNewArticles)
             @ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
@@ -185,6 +184,7 @@ class App.Messages extends App.Controller
               @ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
               $("li[data-ticket-id=#{ticketIdWithNewArticles}] div.nv-recent-message span.nv-recent-msg").text(content)
 
+        @moveTicketToTop(ticketIdWithNewArticles)
         @ticketClickHandler()
         @historyClickHandler()
       error: (xhr) =>
@@ -223,6 +223,10 @@ class App.Messages extends App.Controller
             objectName: 'Ticket'
           )
     )
+
+  moveTicketToTop: (ticketIdWithNewArticles) ->
+    console.log("working")
+    $(".contacts .jspContainer ul.nv-items").prepend($("li[data-ticket-id=#{ticketIdWithNewArticles}]"))
 
   renderView: (ticketData) ->
     localEl = $( App.view('messages')(
