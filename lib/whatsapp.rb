@@ -76,8 +76,8 @@ returns
 
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://7db9-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    callback_url = "https://8d6c-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -219,9 +219,15 @@ returns
       user = User.find(auth.user_id)
       user.update!(user_data)
     else
-      user_data[:active]   = true
+      user = User.where(mobile: login).first
+      user_data[:active] = true
       user_data[:role_ids] = Role.signup_role_ids
-      user                 = User.create(user_data)
+
+      if user
+        user = User.update(user_data)
+      else
+        user = User.create(user_data)
+      end
     end
 
     # create or update authorization
