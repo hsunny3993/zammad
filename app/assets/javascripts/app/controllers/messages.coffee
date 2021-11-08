@@ -225,7 +225,6 @@ class App.Messages extends App.Controller
     )
 
   moveTicketToTop: (ticketIdWithNewArticles) ->
-    console.log("working")
     $(".contacts .jspContainer ul.nv-items").prepend($("li[data-ticket-id=#{ticketIdWithNewArticles}]"))
 
   renderView: (ticketData) ->

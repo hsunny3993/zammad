@@ -193,8 +193,7 @@ returns
   end
 
   def to_user(params)
-    Rails.logger.debug { 'Create user from message...' }
-    Rails.logger.debug { params.inspect }
+    Rails.logger.info { params.inspect }
 
     # do message_user lookup
     begin
@@ -216,6 +215,7 @@ returns
       firstname:          message_user[:wa_name],
     }
     if auth
+      Rails.logger.info { 'Update user from message...' }
       user = User.find(auth.user_id)
       user.update!(user_data)
     else
@@ -224,8 +224,10 @@ returns
       user_data[:role_ids] = Role.signup_role_ids
 
       if user
+        Rails.logger.info { 'Update user from message...' }
         user = User.update(user_data)
       else
+        Rails.logger.info { 'Create user from message...' }
         user = User.create(user_data)
       end
     end
@@ -249,9 +251,8 @@ returns
   def to_ticket(params, user, group_id, channel)
     UserInfo.current_user_id = user.id
 
-    Rails.logger.debug { 'Create ticket from message...' }
-    Rails.logger.debug { params.inspect }
-    Rails.logger.debug { user.inspect }
+    Rails.logger.info { params.inspect }
+    Rails.logger.info { user.inspect }
 
     # prepare title
     title = '-'
@@ -284,6 +285,7 @@ returns
     ticket           = possible_tickets.find_each.find { |possible_ticket| possible_ticket.preferences[:channel_id].to_i == channel.id }
 
     if ticket
+      Rails.logger.info { 'Update ticket from message...' }
       # check if title need to be updated
       if ticket.title == '-'
         ticket.title = title
@@ -296,6 +298,7 @@ returns
       return ticket
     end
 
+    Rails.logger.info { 'Create ticket from message...' }
     ticket = Ticket.new(
       group_id:    1,
       title:       title,
@@ -308,7 +311,7 @@ returns
       },
       created_by_id: 1,
       updated_by_id: 1
-      )
+    )
     ticket.save!
     ticket
   end
@@ -545,6 +548,7 @@ returns
 
     # use transaction
     begin
+      Rails.logger.info { "New message arrived from WA" }
       Transaction.execute(reset_user_id: true) do
         user   = to_user(params)
         ticket = to_ticket(params, user, group_id, channel)
