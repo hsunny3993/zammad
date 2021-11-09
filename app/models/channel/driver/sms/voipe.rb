@@ -61,6 +61,7 @@ class Channel::Driver::Sms::Voipe < Channel::Driver::Sms::Base
         user = User.find_by(id: preferences['from'][0]['o_id'])
       end
     end
+
     if !user
       user = User.create!(
         firstname: attr['src'],
@@ -82,6 +83,27 @@ class Channel::Driver::Sms::Voipe < Channel::Driver::Sms::Base
         ticket.state = Ticket::State.find_by(default_follow_up: true)
         ticket.save!
       end
+
+      Ticket::Article.create!(
+        ticket_id:    ticket.id,
+        type:         article_type_sms,
+        sender:       Ticket::Article::Sender.find_by(name: 'Customer'),
+        body:         attr['msg'],
+        from:         attr['src'],
+        to:           attr['dst'],
+        message_id:   attr['id'],
+        content_type: 'text/plain',
+        preferences:  {
+          channel_id: channel.id,
+          sms:        {
+            AccountSid: attr['account_id'],
+            From:       attr['src'],
+            To:         attr['dst'],
+          }
+        },
+        updated_by_id: user.id,
+        created_by_id: user.id
+      )
     else
       title = attr['msg']
       if title.length > 40
@@ -103,28 +125,33 @@ class Channel::Driver::Sms::Voipe < Channel::Driver::Sms::Base
         }
       )
       ticket.save!
+
+      Ticket::Article.create!(
+        ticket_id:    ticket.id,
+        type:         article_type_sms,
+        sender:       Ticket::Article::Sender.find_by(name: 'Customer'),
+        body:         attr['msg'],
+        from:         attr['src'],
+        to:           attr['dst'],
+        message_id:   attr['id'],
+        content_type: 'text/plain',
+        preferences:  {
+          channel_id: channel.id,
+          sms:        {
+            AccountSid: attr['account_id'],
+            From:       attr['src'],
+            To:         attr['dst'],
+          }
+        },
+        updated_by_id: user.id,
+        created_by_id: user.id
+      )
+
+      # Trigger sms ticket
+      TransactionDispatcher.commit
     end
 
-    Ticket::Article.create!(
-      ticket_id:    ticket.id,
-      type:         article_type_sms,
-      sender:       Ticket::Article::Sender.find_by(name: 'Customer'),
-      body:         attr['msg'],
-      from:         attr['src'],
-      to:           attr['dst'],
-      message_id:   attr['id'],
-      content_type: 'text/plain',
-      preferences:  {
-        channel_id: channel.id,
-        sms:        {
-          AccountSid: attr['account_id'],
-          From:       attr['src'],
-          To:         attr['dst'],
-        }
-      }
-    )
-
-    ['application/xml; charset=UTF-8;', 'Received new sms msg!']
+    ['application/xml; charset=UTF-8;', 'Received your SMS msg!']
   end
 
   def self.definition

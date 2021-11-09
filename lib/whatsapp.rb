@@ -77,7 +77,7 @@ returns
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
     callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://8d6c-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://055a-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -225,10 +225,10 @@ returns
 
       if user
         Rails.logger.info { 'Update user from message...' }
-        user = User.update(user_data)
+        user.update(user_data)
       else
         Rails.logger.info { 'Create user from message...' }
-        user = User.create(user_data)
+        user.create(user_data)
       end
     end
 
@@ -317,7 +317,6 @@ returns
   end
 
   def to_article(params, user, ticket, channel, article = nil)
-
     if article
       Rails.logger.debug { 'Update article from message...' }
     else
@@ -380,7 +379,6 @@ returns
 
     # add document
     if params[:messages][0][:type] == 'document'
-
       document = params[:messages][0][:document]
       body     = '&nbsp;'
 
@@ -446,7 +444,6 @@ returns
 
     # add voice
     if params[:messages][0][:type] == 'voice'
-
       voice = params[:messages][0][:voice]
       body  = '&nbsp;'
 
@@ -490,7 +487,6 @@ returns
 
     # add sticker
     if params[:messages][0][:sticker]
-
       sticker = params[:messages][0][:sticker]
       emoji   = sticker[:emoji]
       thumb   = sticker[:thumb]
@@ -562,7 +558,6 @@ returns
   end
 
   def from_article(article)
-
     message = nil
     Rails.logger.debug { "Create whatsapp personal message from article to '#{article[:to]}'..." }
 

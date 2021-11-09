@@ -1856,6 +1856,7 @@ result
     Ticket::Article.create(
       ticket_id:     id,
       subject:       'SMS notification',
+      from:          '-',
       to:            sms_recipients_to,
       body:          body,
       internal:      value['internal'] || false, # default to public if value was not set
@@ -1917,6 +1918,7 @@ result
     Ticket::Article.create(
       ticket_id:     id,
       subject:       'WhatsApp Notification',
+      from:          '-',
       to:            whatsapp_recipients_to,
       body:          body,
       internal:      value['internal'] || false, # default to public if value was not set

@@ -46,7 +46,7 @@ namespace :sms do
           adapter = channel.options[:adapter]
           driver_class = "::Channel::Driver::#{adapter.to_classname}".constantize
           driver_instance = driver_class.new
-          result = driver_instance.process(sms)
+          driver_instance.process(sms)
         }
       end
     end
