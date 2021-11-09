@@ -14,16 +14,6 @@ class Channel::Driver::Sms::Voipe < Channel::Driver::Sms::Base
 
     Rails.logger.info "Backend sending Voipe SMS to #{attr[:recipient]}"
     begin
-      # if Setting.get('developer_mode') != true
-      #   result = api(options).messages.create(
-      #     from: options[:sender],
-      #     to:   attr[:recipient],
-      #     body: attr[:message],
-      #   )
-      #
-      #   raise result.error_message if result.error_code.positive?
-      # end
-
       conn = Faraday.new(
         request: {params_encoder: Faraday::FlatParamsEncoder}
       )
@@ -37,7 +27,7 @@ class Channel::Driver::Sms::Voipe < Channel::Driver::Sms::Base
         msg: attr[:message]
       })
 
-      true
+      response
     rescue => e
       Rails.logger.debug "Voipe SMS error: #{e.inspect}"
       raise e
