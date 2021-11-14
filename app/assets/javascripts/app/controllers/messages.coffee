@@ -835,6 +835,7 @@ class App.Messages extends App.Controller
 
               $(".emojionearea-editor").text("")
               $("#email-body").val("")
+              $("#emoji-area").val("")
             error: =>
               console.log("error")
           )
