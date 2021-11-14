@@ -84,7 +84,7 @@
         <ul class="nv-histories"></ul>
       </div>
       <div class="nv-message-board-footer" style="display: none;">
-        <div id="nv-chat">
+        <div id="nv-chat" style="display: flex;">
           <textarea id="emoji-area"></textarea>
           <i class="fas fa-paper-plane send-msg"></i>
         </div>

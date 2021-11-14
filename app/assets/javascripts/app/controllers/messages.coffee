@@ -730,7 +730,9 @@ class App.Messages extends App.Controller
           msg = $("#email-body").val()
           msg = @convertTextToHtml(msg)
         else
-          msg = $(".emojionearea-editor").text()
+          msg = $("div.emojionearea-editor").text()
+          if msg == ''
+            msg = $("#emoji-area").val()
 
         files = []
         if articleTypeId == 13
@@ -891,10 +893,10 @@ class App.Messages extends App.Controller
     $('.nv-histories').children().remove()
     if articleTypeId == 1
       $("#nv-chat").css("display", "none")
-      $("#nv-chat-email").css("display", "block")
+      $("#nv-chat-email").css("display", "flex")
       $('.dropzone').css('height', 'calc(100% - 64px - 134px)')
     else
-      $("#nv-chat").css("display", "block")
+      $("#nv-chat").css("display", "flex")
       $("#nv-chat-email").css("display", "none")
       $('.dropzone').css('height', 'calc(100% - 64px - 66px)')
 

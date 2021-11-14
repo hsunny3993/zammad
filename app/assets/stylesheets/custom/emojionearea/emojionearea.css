@@ -67,7 +67,8 @@
 }
 
 .emojionearea {
-  margin-right: 26px;
+  /*margin-right: 26px;*/
+  flex: 1;
 }
 
 .emojionearea, .emojionearea * {

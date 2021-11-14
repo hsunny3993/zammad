@@ -431,9 +431,12 @@ html[dir="rtl"] {
 }
 
 .send-msg {
+  z-index: 200;
+  height: 34px;
+  margin-top: 4px;
+  margin-left: 5px;
   cursor: pointer;
   float: right;
-  margin-top: -30px;
   padding-top: 3px;
 }
 
