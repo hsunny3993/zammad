@@ -188,7 +188,7 @@ document = window.document || {};
 
         var defaultOptions = {
             attributes: {
-                dir               : "ltr",
+                // dir               : "ltr",
                 spellcheck        : false,
                 autocomplete      : "off",
                 autocorrect       : "off",
