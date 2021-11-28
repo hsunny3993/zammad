@@ -130,4 +130,4 @@ class App.ManageKnowledgeBase extends App.ControllerTabs
 
     @headerSwitchInput.prop('checked', App.KnowledgeBase.find(@knowledge_base_id).active)
 
-App.Config.set('KnowledgeBase', { prio: 10000, name: 'Knowledge Base', parent: '#manage', target: '#manage/knowledge_base', controller: App.ManageKnowledgeBase, permission: ['admin.knowledge_base'] }, 'NavBarAdmin')
+App.Config.set('KnowledgeBase', { prio: 10000, name: 'Knowledge Base', parent: '#manage', target: '#manage/knowledge_base', controller: App.ManageKnowledgeBase, permission: ['admin.knowledge_base'] }, 'NavBarAdmin-Hide')
