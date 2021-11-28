@@ -396,6 +396,7 @@ class App.Messages extends App.Controller
       (e) =>
         $(".nv-tab-detail").addClass("nv-tab-active")
         $(".nv-tab-channel").removeClass("nv-tab-active")
+        $(".nv-tab-history").removeClass("nv-tab-active")
         $(".nv-customer-info").css("display", "block")
         $(".nv-customer-channel-info").css("display", "none")
     )
@@ -404,10 +405,22 @@ class App.Messages extends App.Controller
     $(".nv-tab-channel").bind(
       "click",
       (e) =>
-        $(".nv-tab-detail").removeClass("nv-tab-active")
         $(".nv-tab-channel").addClass("nv-tab-active")
+        $(".nv-tab-detail").removeClass("nv-tab-active")
+        $(".nv-tab-history").removeClass("nv-tab-active")
         $(".nv-customer-info").css("display", "none")
         $(".nv-customer-channel-info").css("display", "block")
+    )
+
+    $(".nv-tab-history").unbind("click")
+    $(".nv-tab-history").bind(
+      "click",
+      (e) =>
+        $(".nv-tab-history").addClass("nv-tab-active")
+        $(".nv-tab-detail").removeClass("nv-tab-active")
+        $(".nv-tab-channel").removeClass("nv-tab-active")
+        $(".nv-customer-info").css("display", "block")
+        $(".nv-customer-channel-info").css("display", "none")
     )
 
   renderCustomerDetail: (ticket) ->
@@ -420,11 +433,13 @@ class App.Messages extends App.Controller
     lastname = customer.lastname
     email = customer.email
     phone = customer.mobile
+    wa_phone = customer.whatsapp_mobile
     street = customer.street
     city = customer.city
     country = customer.country
 
     $("#phone").val(phone)
+    $("#wa_phone").val(wa_phone)
     $("#email").val(email)
     $("#street").val(street)
     $("#city").val(city)
@@ -988,4 +1003,4 @@ class MessagesRouter extends App.ControllerPermanent
 
 App.Config.set('messages', MessagesRouter, 'Routes')
 App.Config.set('Messages', { controller: 'Messages', permission: ['*'] }, 'permanentTask')
-App.Config.set('Messages', { prio: 99, parent: '', name: 'Messages', target: '#messages', key: 'Messages', permission: ['ticket.agent', 'ticket.customer'], class: 'messages', iconStyle: 'comment-alt' }, 'NavBarRight')
+App.Config.set('Messages', { prio: 99, parent: '', name: 'Messages', target: '#messages', key: 'Messages', permission: ['ticket.agent', 'ticket.customer'], class: 'chat', icon: 'comment-alt' }, 'NavBar')

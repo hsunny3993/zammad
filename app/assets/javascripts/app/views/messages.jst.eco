@@ -126,11 +126,18 @@
           <div class="nv-tab nv-tab-channel">
             <span><%= @T('Channel') %></span>
           </div>
+          <div class="nv-tab nv-tab-history">
+            <span><%= @T('History') %></span>
+          </div>
         </div>
         <div class="nv-customer-info">
           <div class="nv-customer-info-item">
             <label for="phone" class="form-label"><%= @T('Phone') %></label>
-            <input type="number" class="form-control" id="phone">
+            <input type="text" class="form-control" id="phone">
+          </div>
+          <div class="nv-customer-info-item">
+            <label for="wa_phone" class="form-label"><%= @T('Whatsapp Phone') %></label>
+            <input type="text" class="form-control" id="wa_phone">
           </div>
           <div class="nv-customer-info-item">
             <label for="email" class="form-label"><%= @T('Email') %></label>
