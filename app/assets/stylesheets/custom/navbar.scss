@@ -1,16 +1,16 @@
-$navigationWidth: 100px;
+$navigationWidth: 260px;
 
-.navigation {
-  width: $navigationWidth;
-}
+//.navigation {
+//  width: $navigationWidth;
+//}
 
 .user-menu {
-  display: block;
+  //display: block;
 }
 
 .search .logo {
-  margin: -4px 10px 0 18px;
-  width: fit-content;
+  //margin: -4px 10px 0 18px;
+  //width: fit-content;
 }
 
 .user-menu .dropdown-menu {
@@ -33,35 +33,35 @@ $navigationWidth: 100px;
     position: relative;
   }
 }
-@media screen and (max-width: 991px) and (min-width: 0px) {
-  .navigation {
-    position: fixed;
-    height: 45px;
-    width: 100%;
-    z-index: 4;
-    display: flex;
-    bottom: 0px;
-    left: 0px;
-    overflow: hidden;
-  }
-  .navbar-items-personal {
-    display: flex;
-  }
-  .user-menu {
-    flex-direction: unset !important;
-    width: 100%;
-  }
-  .search {
-    padding: 10px 5px 5px;
-    display: block;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    height: 50px;
-  }
-  #app div.content.horizontal {
-    margin-top: 50px;
-    margin-bottom: 50px;
-    margin-left: 0 !important;
-  }
-}
+//@media screen and (max-width: 991px) and (min-width: 0px) {
+//  .navigation {
+//    position: fixed;
+//    height: 45px;
+//    width: 100%;
+//    z-index: 4;
+//    display: flex;
+//    bottom: 0px;
+//    left: 0px;
+//    overflow: hidden;
+//  }
+//  .navbar-items-personal {
+//    display: flex;
+//  }
+//  .user-menu {
+//    flex-direction: unset !important;
+//    width: 100%;
+//  }
+//  .search {
+//    padding: 10px 5px 5px;
+//    display: block;
+//    position: fixed;
+//    width: 100%;
+//    top: 0;
+//    height: 50px;
+//  }
+//  #app div.content.horizontal {
+//    margin-top: 50px;
+//    margin-bottom: 50px;
+//    margin-left: 0 !important;
+//  }
+//}

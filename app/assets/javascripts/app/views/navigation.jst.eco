@@ -1,6 +1,6 @@
 <div id="navigation" class="navigation vertical">
   <div class="search">
-    <!--
+
     <form class="search-holder">
       <input id="global-search" type="search" autocomplete="off">
       <%- @Icon('magnifier') %>
@@ -9,7 +9,7 @@
         <%- @Icon('diagonal-cross') %>
       </div>
     </form>
-    -->
+
     <div class="logo js-toggleNotifications">
       <%- @Icon('logo') %>
       <div class="activity-counter js-notificationsCounter"></div>
@@ -27,10 +27,10 @@
       <ul class="global-search-result js-global-search-result" role="menu"></ul>
     </div>
   </div>
-  <!--
+
   <div class="menu js-menu"></div>
   <div class="tasks tasks-navigation"></div>
-  -->
+
   <% if !_.isEmpty(@user): %>
     <ul class="user-menu navbar-items-personal"></ul>
   <% end %>
