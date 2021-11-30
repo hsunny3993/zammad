@@ -364,6 +364,18 @@ class TicketsController < ApplicationController
     }
   end
 
+  # GET /api/v1/tickets_by_customer/1
+  def tickets_by_customer()
+    paginate_with(max: 100)
+
+    customer_id = params[:customer_id]
+    histories = Ticket::Article.where(ticket_id: Ticket.select(:id).where(customer_id: customer_id)).order(created_at: :asc)
+
+    render json: {
+      histories: histories
+    }
+  end
+
   # GET /api/v1/ticket_recent
   def ticket_recent
     ticket_ids = RecentView.list(current_user, 10, Ticket.name).map(&:o_id)

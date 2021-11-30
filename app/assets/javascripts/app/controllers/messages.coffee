@@ -357,6 +357,49 @@ class App.Messages extends App.Controller
 
     $('.nv-histories').append(history)
 
+  renderHistory: (article) ->
+    inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
+
+    mimeType = ""
+    if article.attachments? and article.attachments.length > 0
+      msgType = article.attachments[0]['preferences']['Mime-Type']
+      attachmentId = article.attachments[0]['id']
+
+      if typeof msgType == "undefined"
+        msgType = article.attachments[0]['preferences']['Content-Type']
+
+    mimeHTML = ""
+    if msgType? and msgType == "application/pdf"
+      mimeHTML = """
+        <i class="fas fa-file-pdf" style='color: #d61313;'></i>
+      """
+
+    if msgType? and msgType.startsWith("audio")
+      mimeHTML = """
+        <audio src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></audio>
+      """
+
+    if msgType? and msgType.startsWith("video")
+      mimeHTML = """
+        <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></video>
+      """
+
+    history = """
+      <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
+        <span class="nv-avatar avatar-#{article.created_by_id}"></span>
+        <div class="nv-history-body">
+          <div class="nv-message">
+            <div style="display: block;">
+              #{article.body}
+              #{mimeHTML}
+            </div>
+          </div>
+        </div>
+      </li>
+    """
+
+    $('.nv-all-histories ul').append(history)
+
   ticketClickHandler: ->
     @$('.nv-items li').unbind('click')
     @$('.nv-items li').bind(
@@ -399,6 +442,7 @@ class App.Messages extends App.Controller
         $(".nv-tab-history").removeClass("nv-tab-active")
         $(".nv-customer-info").css("display", "block")
         $(".nv-customer-channel-info").css("display", "none")
+        $(".nv-all-histories").css("display", "none")
     )
 
     $(".nv-tab-channel").unbind("click")
@@ -408,19 +452,22 @@ class App.Messages extends App.Controller
         $(".nv-tab-channel").addClass("nv-tab-active")
         $(".nv-tab-detail").removeClass("nv-tab-active")
         $(".nv-tab-history").removeClass("nv-tab-active")
-        $(".nv-customer-info").css("display", "none")
         $(".nv-customer-channel-info").css("display", "block")
+        $(".nv-customer-info").css("display", "none")
+        $(".nv-all-histories").css("display", "none")
     )
 
     $(".nv-tab-history").unbind("click")
     $(".nv-tab-history").bind(
       "click",
       (e) =>
+#        console.log(@tickets)
         $(".nv-tab-history").addClass("nv-tab-active")
         $(".nv-tab-detail").removeClass("nv-tab-active")
         $(".nv-tab-channel").removeClass("nv-tab-active")
-        $(".nv-customer-info").css("display", "block")
         $(".nv-customer-channel-info").css("display", "none")
+        $(".nv-customer-info").css("display", "none")
+        $(".nv-all-histories").css("display", "block")
     )
 
   renderCustomerDetail: (ticket) ->
@@ -429,6 +476,7 @@ class App.Messages extends App.Controller
     if customer == null || typeof customer == "undefined"
       customer = App.User.find(ticket.customer_id)
 
+    ticket_number = ticket.number
     firstname = customer.firstname
     lastname = customer.lastname
     email = customer.email
@@ -438,6 +486,7 @@ class App.Messages extends App.Controller
     city = customer.city
     country = customer.country
 
+    $("#ticket_number").val(ticket_number)
     $("#phone").val(phone)
     $("#wa_phone").val(wa_phone)
     $("#email").val(email)
@@ -450,6 +499,20 @@ class App.Messages extends App.Controller
 
     $(".nv-customer-channel-info").text(channelName)
     $(".customer_detail").css("display", "block")
+
+    $.ajax(
+      type: 'GET'
+      url:  "#{App.Config.get('api_path')}/tickets_by_customer/#{ticket.customer_id}"
+      processData: true,
+      success: (data) =>
+        console.log("result => ", data)
+        for article in data.histories
+          @renderHistory(article)
+          @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
+          @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
+      error: =>
+        console.log("Failed to initialize")
+    )
 
     @renderAvatar('.nv-customer-avatar', ticket.customer_id)
     @renderBadge(".nv-customer-channel", ticket)
@@ -907,6 +970,7 @@ class App.Messages extends App.Controller
     $("li[data-ticket-id=#{ticketId}] span.nv-contact-name i").remove()
 
     $('.nv-histories').children().remove()
+    $('.nv-all-histories ul').children().remove()
     if articleTypeId == 1
       $("#nv-chat").css("display", "none")
       $("#nv-chat-email").css("display", "flex")
