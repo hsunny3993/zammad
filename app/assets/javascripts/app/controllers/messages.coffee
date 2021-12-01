@@ -357,7 +357,7 @@ class App.Messages extends App.Controller
 
     $('.nv-histories').append(history)
 
-  renderHistory: (article) ->
+  renderHistory: (ticket_number, article) ->
     inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
 
     mimeType = ""
@@ -390,8 +390,13 @@ class App.Messages extends App.Controller
         <div class="nv-history-body">
           <div class="nv-message">
             <div style="display: block;">
-              #{article.body}
+              <span style="display: block; float: left;">
+                #{'[' + ticket_number + '] ' + article.body}
+              </span>
               #{mimeHTML}
+              <span style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
+                #{@formattedDateTime(article.updated_at)}
+              </span>
             </div>
           </div>
         </div>
@@ -505,9 +510,8 @@ class App.Messages extends App.Controller
       url:  "#{App.Config.get('api_path')}/tickets_by_customer/#{ticket.customer_id}"
       processData: true,
       success: (data) =>
-        console.log("result => ", data)
         for article in data.histories
-          @renderHistory(article)
+          @renderHistory(ticket_number, article)
           @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
           @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
       error: =>
