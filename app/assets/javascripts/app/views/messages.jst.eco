@@ -6,7 +6,7 @@
       </div>-->
 
       <div class="nv-tabs">
-        <% if @isAdmin: %>
+        <!--<% if @isAdmin: %>
         <div class="nv-tab nv-tab-active" data-tab-type="all">
           <span><%= @T('All') %></span>
         </div>
@@ -17,7 +17,14 @@
         <div class="nv-tab nv-tab-active">
           <span><%= @T('All') %></span>
         </div>
-        <% end %>
+        <% end %>-->
+
+        <div class="nv-tab nv-tab-active" data-tab-type="open">
+          <span><%= @T('Open') %></span>
+        </div>
+        <div class="nv-tab" data-tab-type="closed">
+          <span><%= @T('Closed') %></span>
+        </div>
       </div>
 
       <div class="nv-contacts-body nv-scrollable" data-auto-height="" style="overflow-y: auto; padding: 0px;">
@@ -26,11 +33,16 @@
             <ul class="nv-items">
               <% idx = 0 %>
               <% for ticket in @tickets: %>
-                <% if idx == 0: %>
-                <li class="nv-item nv-item-active" data-ticket-id="<%= ticket.id %>" data-customer-id="<%= ticket.customer_id %>" data-article-type-id="<%= ticket.create_article_type_id %>" <% if @me == ticket.owner_id: %>data-mine="mine"<% end %>>
+                <% ticket_state_type_id = App.TicketState.findNative(ticket.state_id).state_type_id %>
+                <% ticket_state_name = App.TicketStateType.findNative(ticket_state_type_id).name %>
+
+                <% if idx == 0 && ticket_state_name != "closed": %>
+                  <li class="nv-item nv-item-active" data-ticket-id="<%= ticket.id %>" data-customer-id="<%= ticket.customer_id %>" data-article-type-id="<%= ticket.create_article_type_id %>" <% if ticket_state_name == "closed": %>data-ticket-status="closed" style="display:none;"<% end %>>
+                  <% idx++ %>
                 <% else: %>
-                <li class="nv-item" data-ticket-id="<%= ticket.id %>" data-customer-id="<%= ticket.customer_id %>" data-article-type-id="<%= ticket.create_article_type_id %>" <% if @me == ticket.owner_id: %>data-mine="mine"<% end %>>
+                  <li class="nv-item" data-ticket-id="<%= ticket.id %>" data-customer-id="<%= ticket.customer_id %>" data-article-type-id="<%= ticket.create_article_type_id %>" <% if ticket_state_name == "closed": %>data-ticket-status="closed" style="display:none;"<% end %>>
                 <% end %>
+
                   <a href="#">
                     <span class="nv-item-avatar" id="avatar-<%= ticket.id %>"></span>
                     <div class="nv-body">
@@ -49,7 +61,6 @@
                     </div>
                   </a>
                 </li>
-                <% idx++ %>
               <% end %>
             </ul>
           </div>
