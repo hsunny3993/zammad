@@ -369,7 +369,8 @@ class TicketsController < ApplicationController
     paginate_with(max: 100)
 
     customer_id = params[:customer_id]
-    histories = Ticket::Article.where(ticket_id: Ticket.select(:id).where(customer_id: customer_id)).order(created_at: :asc)
+    # histories = Ticket::Article.where(ticket_id: Ticket.select(:id).where(customer_id: customer_id)).order(created_at: :asc)
+    histories = Ticket.where(customer_id: customer_id).order(created_at: :asc)
 
     render json: {
       histories: histories

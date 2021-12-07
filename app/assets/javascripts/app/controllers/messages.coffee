@@ -357,45 +357,68 @@ class App.Messages extends App.Controller
 
     $('.nv-histories').append(history)
 
-  renderHistory: (ticket_number, article) ->
-    inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
+#  renderHistory: (ticket_number, article) ->
+#    inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
+#
+#    mimeType = ""
+#    if article.attachments? and article.attachments.length > 0
+#      msgType = article.attachments[0]['preferences']['Mime-Type']
+#      attachmentId = article.attachments[0]['id']
+#
+#      if typeof msgType == "undefined"
+#        msgType = article.attachments[0]['preferences']['Content-Type']
+#
+#    mimeHTML = ""
+#    if msgType? and msgType == "application/pdf"
+#      mimeHTML = """
+#        <i class="fas fa-file-pdf" style='color: #d61313;'></i>
+#      """
+#
+#    if msgType? and msgType.startsWith("audio")
+#      mimeHTML = """
+#        <audio src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></audio>
+#      """
+#
+#    if msgType? and msgType.startsWith("video")
+#      mimeHTML = """
+#        <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></video>
+#      """
+#
+#    history = """
+#      <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
+#        <span class="nv-avatar avatar-#{article.created_by_id}"></span>
+#        <div class="nv-history-body">
+#          <div class="nv-message">
+#            <div style="display: block;">
+#              <span style="display: block; float: left;">
+#                #{'[' + ticket_number + '] ' + article.body}
+#              </span>
+#              #{mimeHTML}
+#              <span style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
+#                #{@formattedDateTime(article.updated_at)}
+#              </span>
+#            </div>
+#          </div>
+#        </div>
+#      </li>
+#    """
+#
+#    $('.nv-all-histories ul').append(history)
 
-    mimeType = ""
-    if article.attachments? and article.attachments.length > 0
-      msgType = article.attachments[0]['preferences']['Mime-Type']
-      attachmentId = article.attachments[0]['id']
-
-      if typeof msgType == "undefined"
-        msgType = article.attachments[0]['preferences']['Content-Type']
-
-    mimeHTML = ""
-    if msgType? and msgType == "application/pdf"
-      mimeHTML = """
-        <i class="fas fa-file-pdf" style='color: #d61313;'></i>
-      """
-
-    if msgType? and msgType.startsWith("audio")
-      mimeHTML = """
-        <audio src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></audio>
-      """
-
-    if msgType? and msgType.startsWith("video")
-      mimeHTML = """
-        <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></video>
-      """
+  renderHistory: (ticket) ->
 
     history = """
-      <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
-        <span class="nv-avatar avatar-#{article.created_by_id}"></span>
+      <li class="nv-history"  id="#{ticket.id}">
         <div class="nv-history-body">
-          <div class="nv-message">
-            <div style="display: block;">
-              <span style="display: block; float: left;">
-                #{'[' + ticket_number + '] ' + article.body}
-              </span>
-              #{mimeHTML}
-              <span style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
-                #{@formattedDateTime(article.updated_at)}
+          <div class="nv-message" style='width: 100%'>
+            <div style="display: block; width: 100%;">
+              <span style="display: block; float: left; width: 100%;">
+                <a href="/#ticket/zoom/#{ticket.id}" target="_blank" style='width: 100%;'>
+                  #{'[' + ticket.number + ']&nbsp;&nbsp;&nbsp;&nbsp;' + ticket.title}
+                  <i style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
+                    #{@formattedDateTime(ticket.created_at)}
+                  </i>
+                </a>
               </span>
             </div>
           </div>
@@ -510,10 +533,13 @@ class App.Messages extends App.Controller
       url:  "#{App.Config.get('api_path')}/tickets_by_customer/#{ticket.customer_id}"
       processData: true,
       success: (data) =>
-        for article in data.histories
-          @renderHistory(ticket_number, article)
-          @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
-          @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
+#        for article in data.histories
+#          @renderHistory(ticket_number, article)
+#          @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
+#          @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
+
+        for ticket in data.histories
+          @renderHistory(ticket)
       error: =>
         console.log("Failed to initialize")
     )

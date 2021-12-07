@@ -132,7 +132,7 @@
         </div>
 
         <div class="nv-customer-info">
-          <div class="nv-ticket-number">
+          <div class="nv-customer-info-item">
             <label for="ticket_number" class="form-label"><%= @T('Ticket Number') %></label>
             <input type="text" class="form-control" id="ticket_number">
           </div>
