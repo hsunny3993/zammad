@@ -139,7 +139,7 @@ class App.Messages extends App.Controller
               is_mine = 'mine'
 
             ticketHTML = """
-              <li class="nv-item #{activeClass}" data-ticket-id="#{ticketIdWithNewArticles}" data-customer-id="#{ticket.customer_id}" data-article-type-id="#{ticket.create_article_type_id}" data-mine="#{is_mine}">
+              <li class="nv-item #{activeClass}" data-ticket-id="#{ticketIdWithNewArticles}" data-customer-id="#{ticket.customer_id}" data-article-type-id="#{ticket.create_article_type_id}" data-ticket-status="#{is_mine}">
                 <a href="#">
                     <span class="nv-item-avatar" id="avatar-#{ticket.id}"></span>
                     <div class="nv-body">
@@ -569,10 +569,13 @@ class App.Messages extends App.Controller
 
             for ticket in data
               customer = @users[ticket.customer_id]
+              ticket_state_type_id = App.TicketState.findNative(ticket.state_id).state_type_id
+              ticket_state_name = App.TicketStateType.findNative(ticket_state_type_id).name
 
               if customer
-                if id == 1
+                if id == 1 && ticket_state_name != "closed"
                   firstTicket = ticket
+                  id++
 
                 ticket.customer = customer
                 ticket.badge = @getChannelBadge(ticket.create_article_type_id)
@@ -584,7 +587,6 @@ class App.Messages extends App.Controller
 
                 @ticketIds.push(ticket.id)
                 @ticketArticleIds[ticket.id] = ticket.article_ids
-                id++
 
             localEl = @renderView(tickets)
             @html localEl
@@ -667,16 +669,19 @@ class App.Messages extends App.Controller
         $('div.contacts div.nv-tab').removeClass("nv-tab-active")
         $(e.target).addClass("nv-tab-active")
 
-        if tabType == "mine"
+        if tabType == "closed"
           $('div.contacts li.nv-item').map( (idx, ele) =>
-            if $(ele).attr('data-mine') == 'mine'
+            if $(ele).attr('data-ticket-status') == 'closed'
               $(ele).css('display', 'block')
             else
               $(ele).css('display', 'none')
           )
-        else if tabType == "all"
+        else if tabType == "open"
           $('div.contacts li.nv-item').map( (idx, ele) =>
-            $(ele).css('display', 'block')
+            if $(ele).attr('data-ticket-status') == 'closed'
+              $(ele).css('display', 'none')
+            else
+              $(ele).css('display', 'block')
           )
     )
 
