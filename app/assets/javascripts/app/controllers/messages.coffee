@@ -138,8 +138,13 @@ class App.Messages extends App.Controller
             if me == ticket.owner_id
               is_mine = 'mine'
 
+            ticket_state_type_id = App.TicketState.findNative(ticket.state_id).state_type_id
+            ticket_state_name = App.TicketStateType.findNative(ticket_state_type_id).name
+            if ticket_state_name != "closed"
+              ticket_state_name = ""
+
             ticketHTML = """
-              <li class="nv-item #{activeClass}" data-ticket-id="#{ticketIdWithNewArticles}" data-customer-id="#{ticket.customer_id}" data-article-type-id="#{ticket.create_article_type_id}" data-ticket-status="#{is_mine}">
+              <li class="nv-item #{activeClass}" data-ticket-id="#{ticketIdWithNewArticles}" data-customer-id="#{ticket.customer_id}" data-article-type-id="#{ticket.create_article_type_id}" data-ticket-status="#{ticket_state_name}" data-mine="#{is_mine}">
                 <a href="#">
                     <span class="nv-item-avatar" id="avatar-#{ticket.id}"></span>
                     <div class="nv-body">
@@ -235,11 +240,11 @@ class App.Messages extends App.Controller
       me:      App.Session.get('id')
     ) )
 
-  renderAvatar: (element, objectId) ->
+  renderAvatar: (element, objectId, size=40) ->
     new App.WidgetAvatar(
       el:        @$(element)
       object_id: objectId
-      size:      40
+      size:      size
     )
 
   getChannelBadge: (channelId) ->
@@ -414,7 +419,8 @@ class App.Messages extends App.Controller
             <div style="display: block; width: 100%;">
               <span style="display: block; float: left; width: 100%;">
                 <a href="/#ticket/zoom/#{ticket.id}" target="_blank" style='width: 100%;'>
-                  #{'[' + ticket.number + ']&nbsp;&nbsp;&nbsp;&nbsp;' + ticket.title}
+                  <span class="history-badge"></span>
+                  #{'[' + ticket.number + ']&nbsp;&nbsp;&nbsp;' + ticket.title}
                   <i style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
                     #{@formattedDateTime(ticket.created_at)}
                   </i>
@@ -540,6 +546,7 @@ class App.Messages extends App.Controller
 
         for ticket in data.histories
           @renderHistory(ticket)
+          @renderBadge(".history-badge", ticket)
       error: =>
         console.log("Failed to initialize")
     )
@@ -683,6 +690,13 @@ class App.Messages extends App.Controller
             else
               $(ele).css('display', 'block')
           )
+        else if tabType == "mine"
+          $('div.contacts li.nv-item').map( (idx, ele) =>
+            if $(ele).attr('data-mine') == 'mine'
+              $(ele).css('display', 'block')
+            else
+              $(ele).css('display', 'none')
+          )
     )
 
   closeConvHandler: ->
@@ -814,6 +828,15 @@ class App.Messages extends App.Controller
             success: (users) =>
               ticket.owner_id = agent_id
               @tickets[ticketId] = ticket
+              currentUserId = App.Session.get('id')
+
+              if parseInt(agent_id) == currentUserId
+                $("li.nv-item-active[data-ticket-id='#{ticketId}']").attr("data-mine", "mine")
+              else
+                $("li.nv-item-active[data-ticket-id='#{ticketId}']").attr("data-mine", "")
+                currentTab = $("div.contacts div.nv-tab-active span").text()
+                if currentTab = 'Mine'
+                  $("li.nv-item-active[data-ticket-id='#{ticketId}']").css('display', 'none')
 
               alert('Changed')
             error: =>
@@ -992,7 +1015,9 @@ class App.Messages extends App.Controller
       $('.js-value').text("#{currentAgent.firstname} #{currentAgent.lastname}")
 
     # close conversation
-    if ticket.state_id == 4
+    ticket_state_type_id = App.TicketState.findNative(ticket.state_id).state_type_id
+    ticket_state_name = App.TicketStateType.findNative(ticket_state_type_id).name
+    if ticket_state_name == "closed"
       @$('.btn-close-conv').addClass('disabled')
       @$('.dropp').addClass('disabled')
       @$('.btn-close-conv').text(@T('Closed'))
@@ -1075,9 +1100,19 @@ class App.Messages extends App.Controller
     diffMinutes = Math.floor(difference / (60 * 1000))
 
     if diffDays != 0
-      return diffDays + "d"
+#      return diffDays + "d"
+      month = '' + (old_time.getMonth() + 1)
+      day = '' + (old_time.getDate())
+      year = old_time.getFullYear()
+
+      if (month.length < 2)
+        month = '0' + month;
+      if (day.length < 2)
+        day = '0' + day;
+
+      return [year, month, day].join('.')
     if diffHours != 0
-      return diffHours + "h"
+      return diffHours + "h " + diffMinutes + "m"
     if diffMinutes != 0
       return diffMinutes + "m"
 
