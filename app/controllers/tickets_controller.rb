@@ -370,7 +370,7 @@ class TicketsController < ApplicationController
 
     customer_id = params[:customer_id]
     # histories = Ticket::Article.where(ticket_id: Ticket.select(:id).where(customer_id: customer_id)).order(created_at: :asc)
-    histories = Ticket.where(customer_id: customer_id).order(created_at: :asc)
+    histories = Ticket.where(customer_id: customer_id).order(created_at: :desc)
 
     render json: {
       histories: histories

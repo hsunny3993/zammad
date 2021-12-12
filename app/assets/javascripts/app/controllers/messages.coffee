@@ -411,19 +411,24 @@ class App.Messages extends App.Controller
 #    $('.nv-all-histories ul').append(history)
 
   renderHistory: (ticket) ->
+    currentTicketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+    boldStyle = ""
+
+    if currentTicketId == ticket.id
+      boldStyle = "font-weight: 600;"
 
     history = """
       <li class="nv-history"  id="#{ticket.id}">
         <div class="nv-history-body">
           <div class="nv-message" style='width: 100%'>
             <div style="display: block; width: 100%;">
-              <span style="display: block; float: left; width: 100%;">
+              <span style="display: block; float: left; width: 100%; #{boldStyle}">
                 <a href="/#ticket/zoom/#{ticket.id}" target="_blank" style='width: 100%;'>
-                  <span class="history-badge"></span>
+                  <span class="history-badge" id="history-badge-#{ticket.id}"></span>
                   #{'[' + ticket.number + ']&nbsp;&nbsp;&nbsp;' + ticket.title}
-                  <i style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
+                  <span style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
                     #{@formattedDateTime(ticket.created_at)}
-                  </i>
+                  </span>
                 </a>
               </span>
             </div>
@@ -546,7 +551,7 @@ class App.Messages extends App.Controller
 
         for ticket in data.histories
           @renderHistory(ticket)
-          @renderBadge(".history-badge", ticket)
+          @renderBadge("#history-badge-#{ticket.id}", ticket)
       error: =>
         console.log("Failed to initialize")
     )
