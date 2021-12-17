@@ -28,6 +28,7 @@ class UploadCachesController < ApplicationController
         id:       store.id, # TODO: rename?
         filename: file.original_filename,
         size:     store.size,
+        form_id:  params[:id]
       }
     }
   end

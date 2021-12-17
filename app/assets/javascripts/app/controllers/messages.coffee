@@ -1,15 +1,23 @@
 class App.Messages extends App.Controller
   clueAccess: false
 
+  @tickets = {}
+  @users = {}
+  @ticketArticleIds = {}
+  @ticketIds = []
+  @dropzone = undefined
+  @channelType = undefined
+  @ticketUpdatedAtLastCall = undefined
+
   constructor: ->
     super
-    @tickets = {}
-    @users = {}
-    @ticketArticleIds = {}
-    @ticketIds = []
-    @dropzone = undefined
-    @channelType = undefined
-    @ticketUpdatedAtLastCall = undefined
+#    App.Messages.tickets = {}
+#    App.Messages.users = {}
+#    App.Messages.ticketArticleIds = {}
+#    App.Messages.ticketIds = []
+#    App.Messages.dropzone = undefined
+#    App.Messages.channelType = undefined
+#    App.Messages.ticketUpdatedAtLastCall = undefined
 
     # fetch new data if triggered
     @controllerBind('Ticket:update', (data) =>
@@ -63,15 +71,16 @@ class App.Messages extends App.Controller
     return content
 
   fetchMayBe: (data) ->
-    if @tickets[data.id]
-      ticketUpdatedAtLastCall = @tickets[data.id].updated_at
+    console.log("fetchMayBe")
+    if App.Messages.tickets[data.id]
+      ticketUpdatedAtLastCall = App.Messages.tickets[data.id].updated_at
       if ticketUpdatedAtLastCall
         if new Date(data.updated_at).getTime() is new Date(ticketUpdatedAtLastCall).getTime()
           return
         if new Date(data.updated_at).getTime() < new Date(ticketUpdatedAtLastCall).getTime()
           return
 
-      @tickets[data.id].updated_at = data.updated_at
+      App.Messages.tickets[data.id].updated_at = data.updated_at
 
     ticketIdWithNewArticles = data.id
     me = App.Session.get('id')
@@ -82,13 +91,13 @@ class App.Messages extends App.Controller
       processData: true
       success: (data, status, xhr) =>
         ticket = data.assets.Ticket[ticketIdWithNewArticles]
-        @users = data.assets.User
+        App.Messages.users = data.assets.User
         ticket.customer = data.assets.User[ticket.customer_id]
         ticket.owner = data.assets.User[ticket.owner_id]
         curActiveTicketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
 
-        if @tickets[ticketIdWithNewArticles] == null || typeof @tickets[ticketIdWithNewArticles] == "undefined"
-          @tickets[ticketIdWithNewArticles] = ticket
+        if App.Messages.tickets[ticketIdWithNewArticles] == null || typeof App.Messages.tickets[ticketIdWithNewArticles] == "undefined"
+          App.Messages.tickets[ticketIdWithNewArticles] = ticket
 
         oldNum = parseInt($("li[data-ticket-id=#{ticketIdWithNewArticles}] span.nv-contact-name i").text())
         oldNum = if isNaN(oldNum) then 0 else oldNum
@@ -97,7 +106,7 @@ class App.Messages extends App.Controller
         if ticketIdWithNewArticles == curActiveTicketId
           newArticleNums = 0
           for articleId in data.ticket_article_ids
-            if articleId not in @ticketArticleIds[ticketIdWithNewArticles]
+            if articleId not in App.Messages.ticketArticleIds[ticketIdWithNewArticles]
               article = data.assets.TicketArticle[articleId]
 
               @renderArticle(article)
@@ -113,21 +122,21 @@ class App.Messages extends App.Controller
               $("li[data-ticket-id=#{ticketIdWithNewArticles}] span.nv-contact-name").append("<i class='badge-icon badge-new'>#{newArticleNums + oldNum}</i>")
             content = @getShortMsg(article)
             article.body = content
-            @tickets[ticketIdWithNewArticles]['last_article'] = article
-            @ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
+            App.Messages.tickets[ticketIdWithNewArticles]['last_article'] = article
+            App.Messages.ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
             $("li[data-ticket-id=#{ticketIdWithNewArticles}] div.nv-recent-message span.nv-recent-msg").text(content)
 
         else # If the ticket is currently not displayed as active
           # Checks if the ticket is new
-          if ticketIdWithNewArticles not in @ticketIds
-            @ticketIds.push(ticketIdWithNewArticles)
-            @ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
-            @tickets[ticketIdWithNewArticles] = ticket
+          if ticketIdWithNewArticles not in App.Messages.ticketIds
+            App.Messages.ticketIds.push(ticketIdWithNewArticles)
+            App.Messages.ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
+            App.Messages.tickets[ticketIdWithNewArticles] = ticket
 
             lastArticle = data.assets.TicketArticle[Object.keys(data.assets.TicketArticle)[Object.keys(data.assets.TicketArticle).length - 1]]
             content = @getShortMsg(lastArticle)
             lastArticle.body = content
-            @tickets[ticketIdWithNewArticles]['last_article'] = lastArticle
+            App.Messages.tickets[ticketIdWithNewArticles]['last_article'] = lastArticle
 
             activeClass = ""
             badgeClass = @getChannelBadge(ticket.create_article_type_id)
@@ -169,14 +178,14 @@ class App.Messages extends App.Controller
             $(".contacts ul.nv-items").prepend(ticketHTML)
             @renderAvatar("span#avatar-#{ticket.id}", ticket.customer_id)
 
-            @ticketIds.push(ticketIdWithNewArticles)
-            @ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
+            App.Messages.ticketIds.push(ticketIdWithNewArticles)
+            App.Messages.ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
             if isNaN(curActiveTicketId)
               @displayHistory(ticketIdWithNewArticles, ticket.create_article_type_id)
           else
             newArticleNums = 0
             for articleId in data.ticket_article_ids
-              if articleId not in @ticketArticleIds[ticketIdWithNewArticles]
+              if articleId not in App.Messages.ticketArticleIds[ticketIdWithNewArticles]
                 newArticleNums++
                 article = data.assets.TicketArticle[articleId]
 
@@ -185,8 +194,8 @@ class App.Messages extends App.Controller
               $("li[data-ticket-id=#{ticketIdWithNewArticles}] span.nv-contact-name").append("<i class='badge-icon badge-new'>#{newArticleNums + oldNum}</i>")
               content = @getShortMsg(article)
               article.body = content
-              @tickets[ticketIdWithNewArticles]['last_article'] = article
-              @ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
+              App.Messages.tickets[ticketIdWithNewArticles]['last_article'] = article
+              App.Messages.ticketArticleIds[ticketIdWithNewArticles] = data.ticket_article_ids
               $("li[data-ticket-id=#{ticketIdWithNewArticles}] div.nv-recent-message span.nv-recent-msg").text(content)
 
         @moveTicketToTop(ticketIdWithNewArticles)
@@ -203,7 +212,7 @@ class App.Messages extends App.Controller
         @renderDone = false
 
         # if ticket is already loaded, ignore status "0" - network issues e. g. temp. not connection
-        if @ticketUpdatedAtLastCall && status is 0
+        if App.Messages.ticketUpdatedAtLastCall && status is 0
           console.log('network issues e. g. temp. no connection', status, statusText, detail)
           return
 
@@ -333,7 +342,7 @@ class App.Messages extends App.Controller
     mimeHTML = ""
     if msgType? and msgType == "application/pdf"
       mimeHTML = """
-        <i class="fas fa-file-pdf" style='color: #d61313;'></i>
+        <a href="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" target="_blank"><i class="fas fa-file-pdf" style='color: #d61313;'></i></a>
       """
 
     if msgType? and msgType.startsWith("audio")
@@ -500,7 +509,7 @@ class App.Messages extends App.Controller
     $(".nv-tab-history").bind(
       "click",
       (e) =>
-#        console.log(@tickets)
+#        console.log(App.Messages.tickets)
         $(".nv-tab-history").addClass("nv-tab-active")
         $(".nv-tab-detail").removeClass("nv-tab-active")
         $(".nv-tab-channel").removeClass("nv-tab-active")
@@ -510,8 +519,8 @@ class App.Messages extends App.Controller
     )
 
   renderCustomerDetail: (ticket) ->
-    @channelType = ticket.create_article_type_id
-    customer = @users[ticket.customer_id]
+    App.Messages.channelType = ticket.create_article_type_id
+    customer = App.Messages.users[ticket.customer_id]
     if customer == null || typeof customer == "undefined"
       customer = App.User.find(ticket.customer_id)
 
@@ -534,7 +543,7 @@ class App.Messages extends App.Controller
     $("#country").val(country)
     $(".nv-customer-name").text("#{firstname} #{lastname}")
 
-    channelName = @getChannelBadgeTitle(@channelType)
+    channelName = @getChannelBadgeTitle(App.Messages.channelType)
 
     $(".nv-customer-channel-info").text(channelName)
     $(".customer_detail").css("display", "block")
@@ -567,20 +576,20 @@ class App.Messages extends App.Controller
       processData: true,
       success: (users) =>
         for user in users
-          @users[user.id] = user
+          App.Messages.users[user.id] = user
 
         $.ajax(
           type: 'GET'
           url:  "#{App.Config.get('api_path')}/tickets?expand=true"
           processData: true,
           success: (data) =>
-            @tickets = {}
+            App.Messages.tickets = {}
             tickets = []
             firstTicket = undefined
             id = 1
 
             for ticket in data
-              customer = @users[ticket.customer_id]
+              customer = App.Messages.users[ticket.customer_id]
               ticket_state_type_id = App.TicketState.findNative(ticket.state_id).state_type_id
               ticket_state_name = App.TicketStateType.findNative(ticket_state_type_id).name
 
@@ -594,11 +603,11 @@ class App.Messages extends App.Controller
                 if ticket.last_article
                   ticket.last_article.body = @getShortMsg(ticket.last_article)
                   ticket.last_article.formattedTime = @formattedDateTime(ticket.last_article.updated_at)
-                @tickets[ticket.id] = ticket
+                App.Messages.tickets[ticket.id] = ticket
                 tickets.push(ticket)
 
-                @ticketIds.push(ticket.id)
-                @ticketArticleIds[ticket.id] = ticket.article_ids
+                App.Messages.ticketIds.push(ticket.id)
+                App.Messages.ticketArticleIds[ticket.id] = ticket.article_ids
 
             localEl = @renderView(tickets)
             @html localEl
@@ -712,7 +721,7 @@ class App.Messages extends App.Controller
           return
 
         ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
-        ticket = @tickets[ticketId]
+        ticket = App.Messages.tickets[ticketId]
 
         reqBody = {
           'customer_id': ticket.customer_id,
@@ -739,7 +748,7 @@ class App.Messages extends App.Controller
           data: reqBody,
           success: (users) =>
             ticket.state_id = 4       # update a set of ticket with closed ticket
-            @tickets[ticketId] = ticket
+            App.Messages.tickets[ticketId] = ticket
             @$('.btn-close-conv').addClass('disabled')
 
             alert('Closed')
@@ -756,7 +765,7 @@ class App.Messages extends App.Controller
       success: (users) =>
         ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
         customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
-        ticket = @tickets[ticketId]
+        ticket = App.Messages.tickets[ticketId]
         html = ""
 
         for user in users
@@ -800,7 +809,7 @@ class App.Messages extends App.Controller
 
           ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
           customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
-          ticket = @tickets[ticketId]
+          ticket = App.Messages.tickets[ticketId]
 
           agent_name = $("input[name='agent']:checked").parent().text()
           agent_id = $("input[name='agent']:checked").val()
@@ -832,7 +841,7 @@ class App.Messages extends App.Controller
             data: reqBody,
             success: (users) =>
               ticket.owner_id = agent_id
-              @tickets[ticketId] = ticket
+              App.Messages.tickets[ticketId] = ticket
               currentUserId = App.Session.get('id')
 
               if parseInt(agent_id) == currentUserId
@@ -877,118 +886,33 @@ class App.Messages extends App.Controller
 
         files = []
         if articleTypeId == 13
-          files = @dropzone.getQueuedFiles()
+          files = App.Messages.dropzone.getQueuedFiles()
 
         for file in files
-          result = @dropzone.processFile(file)
+          App.Messages.dropzone.processFile(file)
 
-        if msg != ""
-          ticket = @tickets[ticketId]
-
-          owner = @users[ticket.owner_id]
-          if owner == null || typeof owner == "undefined"
-            owner = App.User.find(ticket.owner_id)
-
-          customer = @users[ticket.customer_id]
-          if customer == null || typeof customer == "undefined"
-            customer = App.User.find(ticket.customer_id)
-
-          currentUser = App.Session.get();
-
+        if files.length == 0 and msg != ""
+          msg = ""
+          articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
           if articleTypeId == 1
-            article = {
-              'body': msg,
-              'cc': '',
-              'content_type': 'text/plain',
-              'form_id': '',
-              'from': "#{currentUser.firstname} #{currentUser.lastname}",
-              'in_reply_to': '',
-              'internal': false,
-              'sender_id': 1,
-              'subject': '',
-              'subtype': '',
-              'ticket_id': ticketId,
-              'to': customer.email,
-              'type_id': @channelType,
-            }
-          else if articleTypeId == 2
-            article = {
-              'body': msg,
-              'cc': '',
-              'content_type': 'text/plain',
-              'form_id': '',
-              'from': "#{currentUser.firstname} #{currentUser.lastname}",
-              'in_reply_to': '',
-              'internal': false,
-              'sender_id': 1,
-              'subject': '',
-              'subtype': '',
-              'ticket_id': ticketId,
-              'to': customer.mobile,
-              'type_id': @channelType,
-            }
+            msg = $("#email-body").val()
+            msg = @convertTextToHtml(msg)
           else
-            article = {
-              'body': msg,
-              'cc': '',
-              'content_type': 'text/plain',
-              'form_id': '',
-              'from': "#{currentUser.firstname} #{currentUser.lastname}",
-              'in_reply_to': '',
-              'internal': false,
-              'sender_id': 1,
-              'subject': '',
-              'subtype': '',
-              'ticket_id': ticketId,
-              'to': '',
-              'type_id': @channelType,
-            }
+            msg = $("div.emojionearea-editor").text()
+            if msg == ''
+              msg = $("#emoji-area").val()
 
-          reqBody = {
-            'article': article,
-            'customer_id': customerId,
-            'group_id': ticket.group_id,
-            'id': ticketId,
-            'number': ticket.number,
-            'owner_id': ticket.owner_id,
-            'pending_time': null,
-            'preferences': {
-              'channel_id': if ticket.preferences then ticket.preferences.channel_id else '',
-              'customer_phone_number': if ticket.preferences then ticket.preferences.customer_phone_number else ''
-            },
-            'priority_id': ticket.priority_id,
-            'state_id': ticket.state_id,
-            'title': ticket.title,
-            'updated_at': Date.now()
-          }
-
-          $.ajax(
-            type: 'PUT'
-            url:  "#{App.Config.get('api_path')}/tickets/#{ticketId}?all=true"
-            processData: true,
-            headers: {'X-CSRF-Token': App.Ajax.token()},
-            data: reqBody,
-            before: =>
-              $("li[data-ticket-id=#{ticketId}] span.nv-contact-name i").remove()
-            success: (data) =>
-              new_state_id = data['assets']['Ticket'][data.ticket_id]['state_id']
-              @tickets[ticketId].state_id = new_state_id
-
-              $(".emojionearea-editor").text("")
-              $("#email-body").val("")
-              $("#emoji-area").val("")
-            error: =>
-              console.log("error")
-          )
+          form_id = App.ControllerForm.formId()
+          App.Messages.createArticle(msg, form_id)
     )
 
   initFileTransfer: ->
     Dropzone.autoDiscover = false
-    if typeof @dropzone == "undefined"
-      @dropzone = new Dropzone(
+    if typeof App.Messages.dropzone == "undefined"
+      App.Messages.dropzone = new Dropzone(
         ".dropzone",
         {
-          url: "#{App.Config.get('api_path')}/upload_caches/1",
+          url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
           thumbnailMethod: 'crop',
           maxFilesize: 5,
           parallelUploads: 2,
@@ -998,17 +922,138 @@ class App.Messages extends App.Controller
           paramName: "File",
           headers: {'X-CSRF-Token': App.Ajax.token()}
           success: (file, response) ->
-            response = JSON.parse(response)
-            if (response.status == "success")
-              dropzone.removeFile(file)
+            console.log(file)
+            console.log(response)
+            if response.success
+              this.removeFile(file)
+
+              msg = ""
+              articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+              if articleTypeId == 1
+                msg = $("#email-body").val()
+                msg = @convertTextToHtml(msg)
+              else
+                msg = $("div.emojionearea-editor").text()
+                if msg == ''
+                  msg = $("#emoji-area").val()
+              if msg == ""
+                msg = response.data.filename
+
+              App.Messages.createArticle(msg, response.data.form_id)
             else
               console.log("Failed to send image")
+          accept: (file, done) ->
+            console.log(file)
+            if file.type in ['audio/aac', 'audio/mp4', 'audio/amr', 'audio/mpeg', 'audio/ogg', 'image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/3gpp', 'application/pdf']
+              done()
+            else
+              done("Error! Files of this type are not accepted");
         }
       );
 
+  @createArticle: (msg, form_id) ->
+    ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+    customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
+    articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+
+    ticket = App.Messages.tickets[ticketId]
+    owner = App.Messages.users[ticket.owner_id]
+    if owner == null || typeof owner == "undefined"
+      owner = App.User.find(ticket.owner_id)
+    customer = App.Messages.users[ticket.customer_id]
+    if customer == null || typeof customer == "undefined"
+      customer = App.User.find(ticket.customer_id)
+    currentUser = App.Session.get();
+
+    if articleTypeId == 1
+      article = {
+        'body': msg,
+        'cc': '',
+        'content_type': 'text/plain',
+        'form_id': form_id,
+        'from': "#{currentUser.firstname} #{currentUser.lastname}",
+        'in_reply_to': '',
+        'internal': false,
+        'sender_id': 1,
+        'subject': '',
+        'subtype': '',
+        'ticket_id': ticketId,
+        'to': customer.email,
+        'type_id': App.Messages.channelType,
+      }
+    else if articleTypeId == 2
+      article = {
+        'body': msg,
+        'cc': '',
+        'content_type': 'text/plain',
+        'form_id': form_id,
+        'from': "#{currentUser.firstname} #{currentUser.lastname}",
+        'in_reply_to': '',
+        'internal': false,
+        'sender_id': 1,
+        'subject': '',
+        'subtype': '',
+        'ticket_id': ticketId,
+        'to': customer.mobile,
+        'type_id': App.Messages.channelType,
+      }
+    else
+      article = {
+        'body': msg,
+        'cc': '',
+        'content_type': 'text/plain',
+        'form_id': form_id,
+        'from': "#{currentUser.firstname} #{currentUser.lastname}",
+        'in_reply_to': '',
+        'internal': false,
+        'sender_id': 1,
+        'subject': '',
+        'subtype': '',
+        'ticket_id': ticketId,
+        'to': '',
+        'type_id': App.Messages.channelType,
+      }
+
+    reqBody = {
+      'article': article,
+      'customer_id': customerId,
+      'group_id': ticket.group_id,
+      'id': ticketId,
+      'number': ticket.number,
+      'owner_id': ticket.owner_id,
+      'pending_time': null,
+      'preferences': {
+        'channel_id': if ticket.preferences then ticket.preferences.channel_id else '',
+        'customer_phone_number': if ticket.preferences then ticket.preferences.customer_phone_number else ''
+      },
+      'priority_id': ticket.priority_id,
+      'state_id': ticket.state_id,
+      'title': ticket.title,
+      'updated_at': Date.now()
+    }
+
+    $.ajax(
+      type: 'PUT'
+      url:  "#{App.Config.get('api_path')}/tickets/#{ticketId}?all=true"
+      processData: true,
+      headers: {'X-CSRF-Token': App.Ajax.token()},
+      data: reqBody,
+      before: =>
+        $("li[data-ticket-id=#{ticketId}] span.nv-contact-name i").remove()
+      success: (data) =>
+        new_state_id = data['assets']['Ticket'][data.ticket_id]['state_id']
+        App.Messages.tickets[ticketId].state_id = new_state_id
+
+        $(".emojionearea-editor").text("")
+        $("#email-body").val("")
+        $("#emoji-area").val("")
+      error: =>
+        console.log("error")
+    )
+
   displayHistory: (ticketId, articleTypeId) ->
-    ticket = @tickets[ticketId]
-    currentAgent = @users[ticket.owner_id]
+    ticket = App.Messages.tickets[ticketId]
+    currentAgent = App.Messages.users[ticket.owner_id]
     if currentAgent == null || typeof currentAgent == "undefined"
       currentAgent = App.User.find(ticket.owner_id)
 
@@ -1052,7 +1097,7 @@ class App.Messages extends App.Controller
       url:  "#{App.Config.get('api_path')}/tickets/#{ticketId}?all=true"
       processData: true,
       success: (data) =>
-        @ticketArticleIds[ticketId] = data.ticket_article_ids
+        App.Messages.ticketArticleIds[ticketId] = data.ticket_article_ids
         ticket = data.assets.Ticket[ticketId]
 
         articleIds = data.ticket_article_ids
@@ -1065,17 +1110,23 @@ class App.Messages extends App.Controller
 
         $("#emoji-area").emojioneArea({
           pickerPosition: "top",
-          filtersPosition: "bottom",
+          filtersPosition: "top",
           tones: false,
           autocomplete: false,
           inline: true,
-          hidePickerOnBlur: false
+          hidePickerOnBlur: false,
+          recentEmojis: false
         });
 
         $(".nv-message-board-footer").css("display", "block")
 
         @renderCustomerDetail(ticket)
-        @initFileTransfer()
+        if @getChannelBadgeTitle(ticket.create_article_type_id) == "WhatsApp"
+          @initFileTransfer()
+        else
+          if typeof App.Messages.dropzone != "undefined"
+            App.Messages.dropzone.destroy()
+            App.Messages.dropzone = undefined
       error: =>
         console.log("error")
     )

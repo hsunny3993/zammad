@@ -61,10 +61,7 @@ class CommunicateWhatsappJob < ApplicationJob
           }
         )
 
-        # payload = { :file => Faraday::UploadIO.new(t.path.to_s, content_type) }
-        # payload = { :file => File.new(t.path.to_s) }
         payload = File.binread(t.path.to_s)
-        # payload = URI.encode_www_form(payload)
         media_response = conn.post('/v1/media', payload)
         if media_response.status != 201
           raise Exceptions::UnprocessableEntity, 'Unable to send reply message.'

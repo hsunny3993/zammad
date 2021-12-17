@@ -38,9 +38,10 @@ Rails.application.config.content_security_policy do |policy|
   policy.img_src     '*', :data
   policy.object_src  :none
   policy.script_src  :self, :unsafe_eval, :strict_dynamic
-  policy.style_src   :self, :unsafe_inline, 'cdn.jsdelivr.net'
+  policy.style_src   :self, :unsafe_inline, 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'
   policy.media_src   :self, :data
   policy.frame_src   'www.youtube.com', 'player.vimeo.com', '192.168.2.126:4000', 'zmd5.voipe.cc'
+  policy.connect_src :self, :ws, :wss, 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'
 end
 
 # If you are using UJS then enable automatic nonce generation

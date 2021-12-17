@@ -172,7 +172,7 @@
 }
 .emojionearea.emojionearea-inline {
   height: 34px;
-  z-index: 100;
+  /*z-index: 100;*/
 }
 .emojionearea.emojionearea-inline > .emojionearea-editor {
   height: 32px;
