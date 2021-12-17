@@ -71,7 +71,6 @@ class App.Messages extends App.Controller
     return content
 
   fetchMayBe: (data) ->
-    console.log("fetchMayBe")
     if App.Messages.tickets[data.id]
       ticketUpdatedAtLastCall = App.Messages.tickets[data.id].updated_at
       if ticketUpdatedAtLastCall
@@ -509,7 +508,6 @@ class App.Messages extends App.Controller
     $(".nv-tab-history").bind(
       "click",
       (e) =>
-#        console.log(App.Messages.tickets)
         $(".nv-tab-history").addClass("nv-tab-active")
         $(".nv-tab-detail").removeClass("nv-tab-active")
         $(".nv-tab-channel").removeClass("nv-tab-active")
@@ -922,8 +920,6 @@ class App.Messages extends App.Controller
           paramName: "File",
           headers: {'X-CSRF-Token': App.Ajax.token()}
           success: (file, response) ->
-            console.log(file)
-            console.log(response)
             if response.success
               this.removeFile(file)
 
@@ -943,7 +939,6 @@ class App.Messages extends App.Controller
             else
               console.log("Failed to send image")
           accept: (file, done) ->
-            console.log(file)
             if file.type in ['audio/aac', 'audio/mp4', 'audio/amr', 'audio/mpeg', 'audio/ogg', 'image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/3gpp', 'application/pdf']
               done()
             else
