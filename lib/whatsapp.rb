@@ -200,7 +200,7 @@ returns
       message_user = user(params)
     rescue
       Rails.logger.debug  {
-        (params[:statuses][0][:title]).to_s
+        "#{params[:statuses][0][:title]}"
       }
     end
 
@@ -345,7 +345,7 @@ returns
         sender_id:   Ticket::Article::Sender.find_by(name: 'Customer').id,
         whatsapp_inbound: true,
         from:        params[:messages][0][:from],
-        to:          (channel[:options][:phone_number]).to_s,
+        to:          "#{channel[:options][:phone_number]}",
         message_id:  params[:messages][0][:id],
         internal:    false,
         preferences: {
@@ -382,12 +382,12 @@ returns
       document = params[:messages][0][:document]
       body     = '&nbsp;'
 
-      # document_result = get_file(params, document, api_token)
-      body += if document[:caption]
-                document[:caption].text2html.to_s
-              else
-                document[:id].text2html.to_s
-              end
+      document_result = get_file(params, document, api_token)
+      if document[:caption]
+        body += "#{document[:caption].text2html}"
+      else
+        body += "#{document[:id].text2html}"
+      end
       article.content_type = 'text/html'
       article.body         = body
       article.save!
@@ -399,7 +399,7 @@ returns
       Store.add(
         object:      'Ticket::Article',
         o_id:        article.id,
-        # data:        document_result.body,
+        data:        document_result.body,
         filename:    document[:filename],
         preferences: {
           'Mime-Type' => document[:mime_type],
@@ -414,9 +414,9 @@ returns
       body = '&nbsp;'
 
       body += if video[:caption]
-                video[:caption].text2html.to_s
+                "#{video[:caption].text2html}"
               else
-                video[:id].text2html.to_s
+                "#{video[:id].text2html}"
               end
       video_result         = get_file(params, video, api_token)
       article.content_type = 'text/html'
@@ -450,10 +450,10 @@ returns
       if params[:messages][0][:caption]
         body = "<br>#{params[:messages][0][:caption].text2html}"
       else
-        body += voice[:id].text2html.to_s
+        body += "#{voice[:id].text2html}"
       end
 
-      # document_result      = get_file(params, voice, api_token)
+      document_result      = get_file(params, voice, api_token)
       article.content_type = 'text/html'
       article.body         = body
       article.save!
@@ -476,7 +476,7 @@ returns
       Store.add(
         object:      'Ticket::Article',
         o_id:        article.id,
-        # data:        document_result.body,
+        data:        document_result.body,
         filename:    voice[:file_path] || "audio-#{voice[:id]}.#{type}",
         preferences: {
           'Mime-Type' => voice[:mime_type],
@@ -508,7 +508,7 @@ returns
 
       if sticker[:file_id]
 
-        # document_result = get_file(params, sticker, api_token)
+        document_result = get_file(params, sticker, api_token)
         Store.remove(
           object: 'Ticket::Article',
           o_id:   article.id,
@@ -516,7 +516,7 @@ returns
         Store.add(
           object:      'Ticket::Article',
           o_id:        article.id,
-          # data:        document_result.body,
+          data:        document_result.body,
           filename:    sticker[:file_name] || "#{sticker[:set_name]}.webp",
           preferences: {
             'Mime-Type' => 'image/webp', # mime type is not given from Whatsapp API but this is actually WebP
@@ -550,8 +550,8 @@ returns
         ticket = to_ticket(params, user, group_id, channel)
         to_article(params, user, ticket, channel)
       end
-    rescue
-      Rails.logger.debug {"Error message &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"}
+    rescue Exception => e
+      Rails.logger.debug {"Error message &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&#{e}"}
     end
 
     ticket
