@@ -8,6 +8,7 @@ class App.Messages extends App.Controller
   @dropzone = undefined
   @channelType = undefined
   @ticketUpdatedAtLastCall = undefined
+  @emojioneArea = undefined
 
   constructor: ->
     super
@@ -615,6 +616,21 @@ class App.Messages extends App.Controller
             localEl = @renderView(tickets)
             @html localEl
 
+            if typeof App.Messages.emojioneArea == "undefined"
+              App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
+                pickerPosition: "top",
+                filtersPosition: "top",
+                tones: false,
+                autocomplete: false,
+                inline: true,
+                hidePickerOnBlur: false,
+                recentEmojis: false,
+                events: {
+                  keyup: (editor, event) =>
+                    App.Messages.sendMsg(editor, event)
+                }
+              })
+
             for ticket in data
               @renderAvatar("span#avatar-#{ticket.id}", ticket.customer_id)
 
@@ -623,7 +639,6 @@ class App.Messages extends App.Controller
 
             @ticketClickHandler()
             @historyClickHandler()
-            @sendMsgHandler()
             @responsiveHandler()
 
             if @permissionCheck('admin') || @permissionCheck('agent')
@@ -864,50 +879,40 @@ class App.Messages extends App.Controller
         console.log("Failed to render agent selection view")
     )
 
-  convertTextToHtml: (msg) ->
+  @convertTextToHtml: (msg) ->
     exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig
     msg = msg.replace(/\n/g, "<br>")
     msg = msg.replace(exp, "<a href='$1' target='_blank'>$1</a>")
 
     return msg
 
-  sendMsgHandler: ->
-    @$('.send-msg').on(
-      'click'
-      (e) =>
-        ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
-        customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
-        articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+  @sendMsg: (editor, event) ->
+    if event.keyCode == 13
+      ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+      customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
+      articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
 
-        if articleTypeId == 1
-          msg = $("#email-body").val()
-          msg = @convertTextToHtml(msg)
-        else
-          msg = $("div.emojionearea-editor").text()
-          if msg == ''
-            msg = $("#emoji-area").val()
+      if articleTypeId == 1
+        msg = $("#email-body").val()
+        msg = App.Messages.convertTextToHtml(msg)
+      else
+        msg = $("div.emojionearea-editor").html()
+        if msg == ''
+          msg = $("#emoji-area").val()
 
-        files = []
-        if articleTypeId == 13
-          files = App.Messages.dropzone.getQueuedFiles()
+      files = []
+      if articleTypeId == 13
+        files = App.Messages.dropzone.getQueuedFiles()
 
-        for file in files
-          App.Messages.dropzone.processFile(file)
+      for file in files
+        App.Messages.dropzone.processFile(file)
 
-        if files.length == 0 and msg != ""
-          msg = ""
-          articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
-          if articleTypeId == 1
-            msg = $("#email-body").val()
-            msg = @convertTextToHtml(msg)
-          else
-            msg = $("div.emojionearea-editor").text()
-            if msg == ''
-              msg = $("#emoji-area").val()
-
-          form_id = App.ControllerForm.formId()
-          App.Messages.createArticle(msg, form_id)
-    )
+      if files.length == 0 and msg != ""
+        form_id = App.ControllerForm.formId()
+        App.Messages.createArticle(msg, form_id)
+      else if files.length > 0
+        form_id = App.ControllerForm.formId()
+        App.Messages.createArticle(msg, form_id)
 
   initFileTransfer: ->
     Dropzone.autoDiscover = false
@@ -932,9 +937,9 @@ class App.Messages extends App.Controller
               articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
               if articleTypeId == 1
                 msg = $("#email-body").val()
-                msg = @convertTextToHtml(msg)
+                msg = App.Messages.convertTextToHtml(msg)
               else
-                msg = $("div.emojionearea-editor").text()
+                msg = $("div.emojionearea-editor").html()
                 if msg == ''
                   msg = $("#emoji-area").val()
               if msg == ""
@@ -1108,15 +1113,15 @@ class App.Messages extends App.Controller
           @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
           @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
 
-        $("#emoji-area").emojioneArea({
-          pickerPosition: "top",
-          filtersPosition: "top",
-          tones: false,
-          autocomplete: false,
-          inline: true,
-          hidePickerOnBlur: false,
-          recentEmojis: false
-        });
+#        App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
+#          pickerPosition: "top",
+#          filtersPosition: "top",
+#          tones: false,
+#          autocomplete: false,
+#          inline: true,
+#          hidePickerOnBlur: false,
+#          recentEmojis: false
+#        });
 
         $(".nv-message-board-footer").css("display", "block")
 
