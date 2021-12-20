@@ -76,8 +76,8 @@ returns
 
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://27e1-23-237-32-34.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    callback_url = "https://9a42-23-237-32-34.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -322,9 +322,6 @@ returns
     else
       Rails.logger.debug { 'Create article from message...' }
     end
-    Rails.logger.debug { params.inspect }
-    Rails.logger.debug { user.inspect }
-    Rails.logger.debug { ticket.inspect }
 
     UserInfo.current_user_id = user.id
     media_id = Whatsapp.media_id(params)
@@ -366,7 +363,7 @@ returns
 
       # download photo
       photo_result = get_file(params, photo, api_token)
-      body = "<img src=\"data:image/png;base64,#{Base64.strict_encode64(photo_result.body)}\">"
+      body = "<img src=\"data:image/png;base64,#{Base64.strict_encode64(photo_result.body)}\" style=\"max-width: 80%;\">"
 
       if photo[:caption]
         body += "<br>#{photo[:caption].text2html}"

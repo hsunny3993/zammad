@@ -354,6 +354,11 @@ class App.Messages extends App.Controller
         <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></video>
       """
 
+    if msgType? and msgType.startsWith("image")
+      mimeHTML = """
+        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style='max-width: 100%; min-width: 300px;'></img></div>
+      """
+
     history = """
       <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
         <span class="nv-avatar avatar-#{article.created_by_id}"></span>
@@ -912,7 +917,7 @@ class App.Messages extends App.Controller
         {
           url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
           thumbnailMethod: 'crop',
-          maxFilesize: 5,
+          maxFilesize: 16,
           parallelUploads: 2,
           clickable: false,
           addRemoveLinks: true,
