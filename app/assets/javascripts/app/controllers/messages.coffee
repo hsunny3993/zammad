@@ -40,6 +40,7 @@ class App.Messages extends App.Controller
     App.i18n.translateInline(name)
 
   getShortMsg: (article) ->
+    console.log("getShortMsg")
     if !article
       return ''
 
@@ -74,6 +75,7 @@ class App.Messages extends App.Controller
     return content
 
   fetchMayBe: (data) ->
+    console.log("fetchMayBe", data)
     if App.Messages.tickets[data.id]
       ticketUpdatedAtLastCall = App.Messages.tickets[data.id].updated_at
       if ticketUpdatedAtLastCall
@@ -92,6 +94,7 @@ class App.Messages extends App.Controller
       url:   "#{App.Config.get('api_path')}/tickets/#{ticketIdWithNewArticles}?all=true"
       processData: true
       success: (data, status, xhr) =>
+        console.log("fetchMaybe-ajax", data, status, xhr)
         ticket = data.assets.Ticket[ticketIdWithNewArticles]
         App.Messages.users = data.assets.User
         ticket.customer = data.assets.User[ticket.customer_id]
@@ -331,6 +334,7 @@ class App.Messages extends App.Controller
     )
 
   renderArticle: (article) ->
+    console.log("renderArticle")
     inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
 
     mimeType = ""
@@ -427,6 +431,7 @@ class App.Messages extends App.Controller
 #    $('.nv-all-histories ul').append(history)
 
   renderHistory: (ticket) ->
+    console.log("renderHistory")
     currentTicketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
     boldStyle = ""
 
@@ -576,6 +581,7 @@ class App.Messages extends App.Controller
     @customerDetailTabHandler()
 
   render: ->
+    console.log("render")
     $.ajax(
       type: 'GET'
       url:  "#{App.Config.get('api_path')}/users?expand=true"
@@ -779,14 +785,17 @@ class App.Messages extends App.Controller
     )
 
   renderAgentSelectionView: ->
+    console.log("renderAgentSelectionView")
     $.ajax(
       type: 'GET'
       url:  "#{App.Config.get('api_path')}/users?expand=true"
       processData: true,
       success: (users) =>
+        console.log("renderAgentSelectionView-ajax", users)
         ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
         customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
         ticket = App.Messages.tickets[ticketId]
+        console.log("renderAgentSelectionView-ajax-ticket", App.Messages.tickets)
         html = ""
 
         for user in users
@@ -1029,6 +1038,7 @@ class App.Messages extends App.Controller
     )
 
   @createArticle: (msg, form_id) ->
+    console.log("createArticle", msg, form_id)
     ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
     customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
     articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
@@ -1129,6 +1139,7 @@ class App.Messages extends App.Controller
     )
 
   displayHistory: (ticketId, articleTypeId) ->
+    console.log("displayHistory", ticketId, articleTypeId)
     ticket = App.Messages.tickets[ticketId]
     currentAgent = App.Messages.users[ticket.owner_id]
     if currentAgent == null || typeof currentAgent == "undefined"
