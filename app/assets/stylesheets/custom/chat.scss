@@ -252,6 +252,7 @@ html[dir="rtl"] {
 
 .dropzone {
   z-index: 99;
+  background: image_url("/assets/images/whatsapp-bg.jpg") !important;
 }
 
 ///////////////////////////
@@ -430,7 +431,17 @@ html[dir="rtl"] {
   background: rgb(37, 211, 102);
 }
 
-.send-msg {
+.start-record-audio {
+  z-index: 200;
+  height: 34px;
+  margin-top: 4px;
+  margin-left: 5px;
+  cursor: pointer;
+  float: right;
+  padding-top: 3px;
+}
+
+.stop-record-audio {
   z-index: 200;
   height: 34px;
   margin-top: 4px;
@@ -471,6 +482,7 @@ html[dir="rtl"] {
 
 .nv-inbound .nv-history-body {
   background: white;
+  margin-left: 15px;
 }
 
 .nv-outbound {
@@ -478,9 +490,9 @@ html[dir="rtl"] {
 }
 
 .nv-outbound .nv-history-body {
-  background: #0072aa;
+  background: #c2e3a7;
   margin-right: 15px;
-  color: white;
+  color: #424141;
 }
 
 .nv-history {
@@ -495,17 +507,21 @@ html[dir="rtl"] {
 }
 
 .nv-history-body {
-  min-width: 150px;
+  //min-width: 150px;
   order: 1;
   //margin-left: 14px;
   border-radius: 4px;
   font-size: 1.3rem;
   letter-spacing: 0;
   line-height: 1.5;
-  padding: 8px;
+  padding: 3.5px;
   flex-grow: 1;
   max-width: 500px;
   color: black;
+}
+
+.nv-history-body audio {
+  height: 40px;
 }
 
 .nv-heading {

@@ -77,7 +77,7 @@ returns
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
     callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://9a42-23-237-32-34.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://7a3c-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -363,7 +363,7 @@ returns
 
       # download photo
       photo_result = get_file(params, photo, api_token)
-      body = "<img src=\"data:image/png;base64,#{Base64.strict_encode64(photo_result.body)}\" style=\"max-width: 80%;\">"
+      body = "<img src=\"data:image/png;base64,#{Base64.strict_encode64(photo_result.body)}\" style=\"width: 100%;\">"
 
       if photo[:caption]
         body += "<br>#{photo[:caption].text2html}"

@@ -9,6 +9,8 @@ class App.Messages extends App.Controller
   @channelType = undefined
   @ticketUpdatedAtLastCall = undefined
   @emojioneArea = undefined
+  @mediaRecorder = {}
+  @buffArray = []
 
   constructor: ->
     super
@@ -347,7 +349,7 @@ class App.Messages extends App.Controller
 
     if msgType? and msgType.startsWith("audio")
       mimeHTML = """
-        <audio src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></audio>
+        <audio src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls style="width: 250px;"></audio>
       """
 
     if msgType? and msgType.startsWith("video")
@@ -357,7 +359,7 @@ class App.Messages extends App.Controller
 
     if msgType? and msgType.startsWith("image")
       mimeHTML = """
-        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style='max-width: 100%; min-width: 300px;'></img></div>
+        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style='width: 300px;'></img></div>
       """
 
     history = """
@@ -365,8 +367,8 @@ class App.Messages extends App.Controller
         <span class="nv-avatar avatar-#{article.created_by_id}"></span>
         <div class="nv-history-body">
           <div class="nv-message">
-            <div style="display: block;">
-              #{article.body}
+            <div style="display: block; margin-top: 5px; margin-left: 10px; margin-right: 10px;">
+              <div>#{article.body}</div>
               #{mimeHTML}
             </div>
           </div>
@@ -640,6 +642,7 @@ class App.Messages extends App.Controller
             @ticketClickHandler()
             @historyClickHandler()
             @responsiveHandler()
+            @audioRecordHandler()
 
             if @permissionCheck('admin') || @permissionCheck('agent')
               @tabClickHandler()
@@ -910,9 +913,9 @@ class App.Messages extends App.Controller
       if files.length == 0 and msg != ""
         form_id = App.ControllerForm.formId()
         App.Messages.createArticle(msg, form_id)
-      else if files.length > 0
-        form_id = App.ControllerForm.formId()
-        App.Messages.createArticle(msg, form_id)
+#      else if files.length > 0
+#        form_id = App.ControllerForm.formId()
+#        App.Messages.createArticle(msg, form_id)
 
   initFileTransfer: ->
     Dropzone.autoDiscover = false
@@ -942,8 +945,8 @@ class App.Messages extends App.Controller
                 msg = $("div.emojionearea-editor").html()
                 if msg == ''
                   msg = $("#emoji-area").val()
-              if msg == ""
-                msg = response.data.filename
+#              if msg == ""
+#                msg = response.data.filename
 
               App.Messages.createArticle(msg, response.data.form_id)
             else
@@ -955,6 +958,75 @@ class App.Messages extends App.Controller
               done("Error! Files of this type are not accepted");
         }
       );
+
+  audioRecordHandler: ->
+    audioIN = {
+      audio: true,
+      video: false
+    }
+    start = document.getElementById('start_record')
+    stop = document.getElementById('stop_record')
+
+    navigator.mediaDevices.getUserMedia(audioIN)
+    .then( (mediaStreamObj) =>
+      dataArray = []
+      mediaRecorder = new MediaRecorder(mediaStreamObj)
+
+      start.addEventListener('click', (ev) =>
+        mediaRecorder.start()
+        $('#start_record').css("display", "none")
+        $('#stop_record').css("display", "block")
+      )
+
+      stop.addEventListener('click', (ev) =>
+        mediaRecorder.stop()
+        $('#start_record').css("display", "block")
+        $('#stop_record').css("display", "none")
+      )
+
+      mediaRecorder.ondataavailable = (ev) =>
+        dataArray.push(ev.data)
+
+      mediaRecorder.onstop = (ev) =>
+        audioData = new Blob(
+          dataArray,
+          { 'type': 'audio/mp3;' }
+        )
+        dataArray = []
+        formData = new window.FormData()
+        formData.append('File', audioData)
+
+        $.ajax(
+          url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+#              maxFilesize: 16,
+          headers: {'X-CSRF-Token': App.Ajax.token()}
+          success: (response) ->
+            if response.success
+
+              msg = ""
+              articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+              if articleTypeId == 1
+                msg = $("#email-body").val()
+                msg = App.Messages.convertTextToHtml(msg)
+              else
+                msg = $("div.emojionearea-editor").html()
+                if msg == ''
+                  msg = $("#emoji-area").val()
+              if msg == ""
+                msg = response.data.filename
+
+#              App.Messages.createArticle(msg, response.data.form_id)
+            else
+              console.log("Failed to send record file")
+        )
+    )
+    .catch( (err) =>
+      console.log(err.name, err.message)
+    )
 
   @createArticle: (msg, form_id) ->
     ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))

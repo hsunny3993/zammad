@@ -106,7 +106,8 @@
       <div class="nv-message-board-footer" style="display: none;">
         <div id="nv-chat" style="display: flex;">
           <textarea id="emoji-area"></textarea>
-          <i class="fas fa-paper-plane send-msg"></i>
+          <i class="fas fa-microphone start-record-audio" id="start_record"></i>
+          <i class="fas fa-stop-circle stop-record-audio" id="stop_record" style="display:none;"></i>
         </div>
         <div id="nv-chat-email">
           <!--<div class="form-group">
@@ -118,7 +119,8 @@
           <div class="form-group" style="margin-right: 26px; margin-bottom: 0;">
             <textarea type="text" id="email-body" placeholder="<%= @T('Type here') %>"></textarea>
           </div>
-          <i class="fas fa-paper-plane send-msg" style="margin-top: -45px;"></i>
+          <i id="start_record" class="fas fa-paper-plane send-msg" style="margin-top: -45px;"></i>
+          <i id="stop_record" class="fas fa-stop-circle stop-record-audio" style="display:none;margin-top: -45px;"></i>
         </div>
       </div>
     </div>

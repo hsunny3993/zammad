@@ -20,28 +20,30 @@ class CommunicateWhatsappJob < ApplicationJob
     log_error(article, "Channel.find(#{channel.id}) has not whatsapp api token!") if channel.options[:api_token].blank?
 
     begin
-      conn = Faraday.new(
-        request: {params_encoder: Faraday::FlatParamsEncoder}
-      )
+      unless article.body.empty?
+        conn = Faraday.new(
+          request: { params_encoder: Faraday::FlatParamsEncoder }
+        )
 
-      conn.headers = {
-        'D360-Api-Key'=> channel.options[:api_token],
-        "Content-Type" => "application/json",
-        "Accept" => "application/json"
-      }
-
-      data = {
-        recipient_type: "individual",
-        to: ticket.preferences["customer_phone_number"],
-        type: "text",
-        text: {
-          body: article.body
+        conn.headers = {
+          'D360-Api-Key' => channel.options[:api_token],
+          "Content-Type" => "application/json",
+          "Accept" => "application/json"
         }
-      }
 
-      response = conn.post("https://waba.360dialog.io/v1/messages", data.to_json)
-      if response.status != 201
-        raise Exceptions::UnprocessableEntity, 'Unable to send reply message.'
+        data = {
+          recipient_type: "individual",
+          to: ticket.preferences["customer_phone_number"],
+          type: "text",
+          text: {
+            body: article.body
+          }
+        }
+
+        response = conn.post("https://waba.360dialog.io/v1/messages", data.to_json)
+        if response.status != 201
+          raise Exceptions::UnprocessableEntity, "Unable to send reply message. #{response.inspect}"
+        end
       end
 
       article.attachments.each do |file|
@@ -64,7 +66,7 @@ class CommunicateWhatsappJob < ApplicationJob
         payload = File.binread(t.path.to_s)
         media_response = conn.post('/v1/media', payload)
         if media_response.status != 201
-          raise Exceptions::UnprocessableEntity, 'Unable to send reply message.'
+          raise Exceptions::UnprocessableEntity, "Unable to send reply message.#{media_response.inspect}"
         end
 
         media_id = JSON.parse(media_response.body)["media"].first["id"]
@@ -114,7 +116,7 @@ class CommunicateWhatsappJob < ApplicationJob
 
         response = conn.post("https://waba.360dialog.io/v1/messages", data.to_json)
         if response.status != 201
-          raise Exceptions::UnprocessableEntity, 'Unable to send reply message.'
+          raise Exceptions::UnprocessableEntity, "Unable to send reply message.#{response.inspect}"
         end
       end
     rescue Exception => e
@@ -138,7 +140,8 @@ class CommunicateWhatsappJob < ApplicationJob
 
     article.save!
 
-    Rails.logger.info "Send whatsapp message to: '#{article.to}' (from #{article.from})"
+    Rails.logger.info { "Send whatsapp message to: '#{article.to}' (from #{article.from})" }
+    Rails.logger.info { "********************************** END ***************************************" }
 
     article
   end
