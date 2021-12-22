@@ -999,11 +999,11 @@ class App.Messages extends App.Controller
       mediaRecorder.onstop = (ev) =>
         audioData = new Blob(
           dataArray,
-          { 'type': 'audio/mp3;' }
+          { 'type': 'audio/mpeg' }
         )
         dataArray = []
         formData = new window.FormData()
-        formData.append('File', audioData)
+        formData.append('File', audioData, "record_file.mp3")
 
         $.ajax(
           url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
@@ -1025,10 +1025,8 @@ class App.Messages extends App.Controller
                 msg = $("div.emojionearea-editor").html()
                 if msg == ''
                   msg = $("#emoji-area").val()
-              if msg == ""
-                msg = response.data.filename
 
-#              App.Messages.createArticle(msg, response.data.form_id)
+              App.Messages.createArticle(msg, response.data.form_id)
             else
               console.log("Failed to send record file")
         )
