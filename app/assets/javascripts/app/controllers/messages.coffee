@@ -624,21 +624,6 @@ class App.Messages extends App.Controller
             localEl = @renderView(tickets)
             @html localEl
 
-            if typeof App.Messages.emojioneArea == "undefined"
-              App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
-                pickerPosition: "top",
-                filtersPosition: "top",
-                tones: false,
-                autocomplete: false,
-                inline: true,
-                hidePickerOnBlur: false,
-                recentEmojis: false,
-                events: {
-                  keyup: (editor, event) =>
-                    App.Messages.sendMsg(editor, event)
-                }
-              })
-
             for ticket in data
               @renderAvatar("span#avatar-#{ticket.id}", ticket.customer_id)
 
@@ -663,6 +648,25 @@ class App.Messages extends App.Controller
 
             @$('.customer_detail').removeClass('active-window')
             @$('.customer_detail').addClass('deactive-window')
+
+            setTimeout(
+              () =>
+                if typeof App.Messages.emojioneArea == "undefined"
+                  App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
+                    pickerPosition: "top",
+                    filtersPosition: "top",
+                    tones: false,
+                    autocomplete: false,
+                    inline: true,
+                    hidePickerOnBlur: false,
+                    recentEmojis: false,
+                    events: {
+                      keyup: (editor, event) =>
+                        App.Messages.sendMsg(editor, event)
+                    }
+                  })
+              , 1000
+            )
           error: =>
             console.log("Failed to initialize")
         )
@@ -909,7 +913,7 @@ class App.Messages extends App.Controller
         msg = App.Messages.convertTextToHtml(msg)
       else
         msg = $("div.emojionearea-editor").html()
-        if msg == ''
+        if typeof msg == 'undefined'
           msg = $("#emoji-area").val()
 
       files = []
@@ -952,7 +956,7 @@ class App.Messages extends App.Controller
                 msg = App.Messages.convertTextToHtml(msg)
               else
                 msg = $("div.emojionearea-editor").html()
-                if msg == ''
+                if typeof msg == 'undefined'
                   msg = $("#emoji-area").val()
 #              if msg == ""
 #                msg = response.data.filename
@@ -1015,7 +1019,6 @@ class App.Messages extends App.Controller
           headers: {'X-CSRF-Token': App.Ajax.token()}
           success: (response) ->
             if response.success
-
               msg = ""
               articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
               if articleTypeId == 1
@@ -1023,12 +1026,12 @@ class App.Messages extends App.Controller
                 msg = App.Messages.convertTextToHtml(msg)
               else
                 msg = $("div.emojionearea-editor").html()
-                if msg == ''
+                if typeof msg == 'undefined'
                   msg = $("#emoji-area").val()
 
               App.Messages.createArticle(msg, response.data.form_id)
             else
-              console.log("Failed to send record file")
+              alert("Failed to send record file")
         )
     )
     .catch( (err) =>
