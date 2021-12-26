@@ -11,6 +11,8 @@ class App.Messages extends App.Controller
   @emojioneArea = undefined
   @mediaRecorder = {}
   @buffArray = []
+  @pageIndex = 0
+  @perPage = 10
 
   constructor: ->
     super
@@ -380,7 +382,7 @@ class App.Messages extends App.Controller
       </li>
     """
 
-    $('.nv-histories').append(history)
+    $('.nv-histories').prepend(history)
 
 #  renderHistory: (ticket_number, article) ->
 #    inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
@@ -622,6 +624,7 @@ class App.Messages extends App.Controller
                 App.Messages.ticketArticleIds[ticket.id] = ticket.article_ids
 
             localEl = @renderView(tickets)
+            console.log(localEl)
             @html localEl
 
             for ticket in data
@@ -662,7 +665,7 @@ class App.Messages extends App.Controller
                     recentEmojis: false,
                     events: {
                       keyup: (editor, event) =>
-                        App.Messages.sendMsg(editor, event)
+                        App.Messages.sendMsgByKey(editor, event)
                     }
                   })
               , 1000
@@ -902,7 +905,7 @@ class App.Messages extends App.Controller
 
     return msg
 
-  @sendMsg: (editor, event) ->
+  @sendMsgByKey: (editor, event) ->
     if event.keyCode == 13
       ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
       customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
@@ -926,9 +929,34 @@ class App.Messages extends App.Controller
       if files.length == 0 and msg != ""
         form_id = App.ControllerForm.formId()
         App.Messages.createArticle(msg, form_id)
-#      else if files.length > 0
-#        form_id = App.ControllerForm.formId()
-#        App.Messages.createArticle(msg, form_id)
+
+  sendEmailMsg: () ->
+    @$('.send-email').on(
+      'click'
+      (e) =>
+        ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+        customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
+        articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+
+        if articleTypeId == 1
+          msg = $("#email-body").val()
+          msg = App.Messages.convertTextToHtml(msg)
+        else
+          msg = $("div.emojionearea-editor").html()
+          if typeof msg == 'undefined'
+            msg = $("#emoji-area").val()
+
+        files = []
+        if articleTypeId == 13
+          files = App.Messages.dropzone.getQueuedFiles()
+
+        for file in files
+          App.Messages.dropzone.processFile(file)
+
+        if files.length == 0 and msg != ""
+          form_id = App.ControllerForm.formId()
+          App.Messages.createArticle(msg, form_id)
+    )
 
   initFileTransfer: ->
     Dropzone.autoDiscover = false
@@ -1139,7 +1167,7 @@ class App.Messages extends App.Controller
         console.log("error")
     )
 
-  displayHistory: (ticketId, articleTypeId) ->
+  displayHistory: (ticketId, articleTypeId, pageIndex=App.Messages.pageIndex, perPage=App.Messages.perPage) ->
     console.log("displayHistory", ticketId, articleTypeId)
     ticket = App.Messages.tickets[ticketId]
     currentAgent = App.Messages.users[ticket.owner_id]
@@ -1168,8 +1196,10 @@ class App.Messages extends App.Controller
     # Remove new flag from ticket bar
     $("li[data-ticket-id=#{ticketId}] span.nv-contact-name i").remove()
 
-    $('.nv-histories').children().remove()
-    $('.nv-all-histories ul').children().remove()
+    if pageIndex == 0
+      $('.nv-histories').children().remove()
+      $('.nv-all-histories ul').children().remove()
+
     if articleTypeId == 1
       $("#nv-chat").css("display", "none")
       $("#nv-chat-email").css("display", "flex")
@@ -1183,8 +1213,11 @@ class App.Messages extends App.Controller
 
     $.ajax(
       type: 'GET'
-      url:  "#{App.Config.get('api_path')}/tickets/#{ticketId}?all=true"
+      url:  "#{App.Config.get('api_path')}/tickets_articles/#{ticketId}?page=#{pageIndex}&per_page=#{perPage}"
       processData: true,
+      beforeSend: () =>
+        $("#ajax_loader").removeClass("hide")
+      ,
       success: (data) =>
         App.Messages.ticketArticleIds[ticketId] = data.ticket_article_ids
         ticket = data.assets.Ticket[ticketId]
@@ -1197,28 +1230,42 @@ class App.Messages extends App.Controller
           @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
           @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
 
-#        App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
-#          pickerPosition: "top",
-#          filtersPosition: "top",
-#          tones: false,
-#          autocomplete: false,
-#          inline: true,
-#          hidePickerOnBlur: false,
-#          recentEmojis: false
-#        });
-
         $(".nv-message-board-footer").css("display", "block")
 
         @renderCustomerDetail(ticket)
         if @getChannelBadgeTitle(ticket.create_article_type_id) == "WhatsApp"
           @initFileTransfer()
+          @showAudioRecord()
         else
           if typeof App.Messages.dropzone != "undefined"
             App.Messages.dropzone.destroy()
             App.Messages.dropzone = undefined
+          @hideAudioRecord()
+
+        @displayMoreHistories(ticketId, articleTypeId)
+        $("#ajax_loader").addClass("hide")
       error: =>
         console.log("error")
     )
+
+  displayMoreHistories: (ticketId, articleTypeId) ->
+    thisObj = this
+    $(".nv-histories").unbind("scroll")
+    $(".nv-histories").bind(
+      "scroll",
+      () ->
+        if $(this).scrollTop() == 0
+          App.Messages.pageIndex += 1
+          thisObj.displayHistory(ticketId, articleTypeId, App.Messages.pageIndex)
+    )
+
+  showAudioRecord: =>
+    $("#start_record").css("display", "block")
+    $("#stop_record").css("display", "none")
+
+  hideAudioRecord: =>
+    $("#start_record").css("display", "none")
+    $("#stop_record").css("display", "none")
 
   url: ->
     '#messages'

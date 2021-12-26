@@ -365,15 +365,38 @@ class TicketsController < ApplicationController
   end
 
   # GET /api/v1/tickets_by_customer/1
-  def tickets_by_customer()
-    paginate_with(max: 100)
-
+  def tickets_by_customer
     customer_id = params[:customer_id]
     # histories = Ticket::Article.where(ticket_id: Ticket.select(:id).where(customer_id: customer_id)).order(created_at: :asc)
     histories = Ticket.where(customer_id: customer_id).order(created_at: :desc)
 
     render json: {
       histories: histories
+    }
+  end
+
+  # GET /api/v1/tickets_articles/1
+  def tickets_articles
+    ticket_id = params[:ticket_id]
+    per_page = Integer(params[:per_page])
+    page = Integer(params[:page])
+    offset = page * per_page
+
+    articles = Ticket::Article.where(ticket_id: ticket_id).order(id: :desc).offset(offset).limit(per_page)
+
+    article_ids = []
+    assets = Hash.new
+    articles.each do |article|
+      next if !authorized?(article, :show?)
+
+      article_ids.push article.id
+      assets = article.assets(assets)
+    end
+
+    render json: {
+      assets:             assets,
+      ticket_article_ids: article_ids,
+      ticket_id:          ticket_id
     }
   end
 

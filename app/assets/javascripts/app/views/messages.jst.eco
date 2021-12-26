@@ -101,6 +101,7 @@
         </div>
       </div>
       <div class="dropzone">
+        <div id="ajax_loader" class="lds-dual-ring hide overlay"></div>
         <ul class="nv-histories"></ul>
       </div>
       <div class="nv-message-board-footer" style="display: none;">
@@ -116,11 +117,10 @@
           <div class="form-group">
             <input type="text" id="cc" placeholder="CC" />
           </div>-->
-          <div class="form-group" style="margin-right: 26px; margin-bottom: 0;">
+          <div class="form-group" style="margin-right: 5px; margin-bottom: 0; float: left; width: 100%;">
             <textarea type="text" id="email-body" placeholder="<%= @T('Type here') %>"></textarea>
           </div>
-          <i id="start_record" class="fas fa-paper-plane send-msg" style="margin-top: -45px;"></i>
-          <i id="stop_record" class="fas fa-stop-circle stop-record-audio" style="display:none;margin-top: -45px;"></i>
+          <i class="fas fa-paper-plane send-email"></i>
         </div>
       </div>
     </div>
