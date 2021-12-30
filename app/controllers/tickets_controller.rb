@@ -375,6 +375,29 @@ class TicketsController < ApplicationController
     }
   end
 
+  # GET /api/v1/ticket_new_articles/1
+  def ticket_new_articles
+    ticket_id = params[:ticket_id]
+    last_article_id = params[:last_article_id]
+
+    new_articles = Ticket::Article.where('ticket_id=? AND id>?', ticket_id, last_article_id).order(id: :desc)
+
+    article_ids = []
+    assets = Hash.new
+    new_articles.each do |article|
+      next if !authorized?(article, :show?)
+
+      article_ids.push article.id
+      assets = article.assets(assets)
+    end
+
+    render json: {
+      assets:             assets,
+      ticket_article_ids: article_ids,
+      ticket_id:          ticket_id
+    }
+  end
+
   # GET /api/v1/tickets_articles/1
   def tickets_articles
     ticket_id = params[:ticket_id]

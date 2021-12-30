@@ -431,6 +431,16 @@ html[dir="rtl"] {
   background: rgb(37, 211, 102);
 }
 
+.send-msg {
+  z-index: 200;
+  height: 34px;
+  margin-top: 4px;
+  margin-left: 5px;
+  cursor: pointer;
+  float: right;
+  padding-top: 3px;
+}
+
 .start-record-audio {
   z-index: 200;
   height: 34px;

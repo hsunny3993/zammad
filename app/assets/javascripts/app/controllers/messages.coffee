@@ -16,13 +16,6 @@ class App.Messages extends App.Controller
 
   constructor: ->
     super
-#    App.Messages.tickets = {}
-#    App.Messages.users = {}
-#    App.Messages.ticketArticleIds = {}
-#    App.Messages.ticketIds = []
-#    App.Messages.dropzone = undefined
-#    App.Messages.channelType = undefined
-#    App.Messages.ticketUpdatedAtLastCall = undefined
 
     # fetch new data if triggered
     @controllerBind('Ticket:update', (data) =>
@@ -42,7 +35,6 @@ class App.Messages extends App.Controller
     App.i18n.translateInline(name)
 
   getShortMsg: (article) ->
-    console.log("getShortMsg")
     if !article
       return ''
 
@@ -77,7 +69,6 @@ class App.Messages extends App.Controller
     return content
 
   fetchMayBe: (data) ->
-    console.log("fetchMayBe", data)
     if App.Messages.tickets[data.id]
       ticketUpdatedAtLastCall = App.Messages.tickets[data.id].updated_at
       if ticketUpdatedAtLastCall
@@ -96,7 +87,6 @@ class App.Messages extends App.Controller
       url:   "#{App.Config.get('api_path')}/tickets/#{ticketIdWithNewArticles}?all=true"
       processData: true
       success: (data, status, xhr) =>
-        console.log("fetchMaybe-ajax", data, status, xhr)
         ticket = data.assets.Ticket[ticketIdWithNewArticles]
         App.Messages.users = data.assets.User
         ticket.customer = data.assets.User[ticket.customer_id]
@@ -116,7 +106,7 @@ class App.Messages extends App.Controller
             if articleId not in App.Messages.ticketArticleIds[ticketIdWithNewArticles]
               article = data.assets.TicketArticle[articleId]
 
-              @renderArticle(article)
+              @renderArticle(article, true)
               @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
               @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
 
@@ -335,8 +325,7 @@ class App.Messages extends App.Controller
       """
     )
 
-  renderArticle: (article) ->
-    console.log("renderArticle")
+  renderArticle: (article, isNewMsg=false) ->
     inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
 
     mimeType = ""
@@ -382,58 +371,13 @@ class App.Messages extends App.Controller
       </li>
     """
 
-    $('.nv-histories').prepend(history)
-
-#  renderHistory: (ticket_number, article) ->
-#    inboundClass = if article.sender_id == 2 then "inbound" else "outbound"
-#
-#    mimeType = ""
-#    if article.attachments? and article.attachments.length > 0
-#      msgType = article.attachments[0]['preferences']['Mime-Type']
-#      attachmentId = article.attachments[0]['id']
-#
-#      if typeof msgType == "undefined"
-#        msgType = article.attachments[0]['preferences']['Content-Type']
-#
-#    mimeHTML = ""
-#    if msgType? and msgType == "application/pdf"
-#      mimeHTML = """
-#        <i class="fas fa-file-pdf" style='color: #d61313;'></i>
-#      """
-#
-#    if msgType? and msgType.startsWith("audio")
-#      mimeHTML = """
-#        <audio src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></audio>
-#      """
-#
-#    if msgType? and msgType.startsWith("video")
-#      mimeHTML = """
-#        <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></video>
-#      """
-#
-#    history = """
-#      <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
-#        <span class="nv-avatar avatar-#{article.created_by_id}"></span>
-#        <div class="nv-history-body">
-#          <div class="nv-message">
-#            <div style="display: block;">
-#              <span style="display: block; float: left;">
-#                #{'[' + ticket_number + '] ' + article.body}
-#              </span>
-#              #{mimeHTML}
-#              <span style="font-size: 10px; color: grey; float: right; padding-top: 4px;">
-#                #{@formattedDateTime(article.updated_at)}
-#              </span>
-#            </div>
-#          </div>
-#        </div>
-#      </li>
-#    """
-#
-#    $('.nv-all-histories ul').append(history)
+    if isNewMsg
+      $('.nv-histories').append(history)
+      @moveToBottom()
+    else
+      $('.nv-histories').prepend(history)
 
   renderHistory: (ticket) ->
-    console.log("renderHistory")
     currentTicketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
     boldStyle = ""
 
@@ -467,6 +411,8 @@ class App.Messages extends App.Controller
     @$('.nv-items li').bind(
       'click'
       (e) =>
+        $(".nv-histories").unbind("scroll")
+
         @$('.contacts').removeClass('active-window')
         @$('.contacts').addClass('deactive-window')
 
@@ -483,6 +429,7 @@ class App.Messages extends App.Controller
         ticketId = parseInt($(e.currentTarget).attr('data-ticket-id'))
         articleTypeId = parseInt($(e.currentTarget).attr('data-article-type-id'))
 
+        App.Messages.pageIndex = 0
         @displayHistory(ticketId, articleTypeId)
     )
 
@@ -566,11 +513,6 @@ class App.Messages extends App.Controller
       url:  "#{App.Config.get('api_path')}/tickets_by_customer/#{ticket.customer_id}"
       processData: true,
       success: (data) =>
-#        for article in data.histories
-#          @renderHistory(ticket_number, article)
-#          @renderAvatar(".avatar-#{article.created_by_id}", article.created_by_id)
-#          @renderBadge(".avatar-#{article.created_by_id} > span", ticket)
-
         for ticket in data.histories
           @renderHistory(ticket)
           @renderBadge("#history-badge-#{ticket.id}", ticket)
@@ -583,7 +525,6 @@ class App.Messages extends App.Controller
     @customerDetailTabHandler()
 
   render: ->
-    console.log("render")
     $.ajax(
       type: 'GET'
       url:  "#{App.Config.get('api_path')}/users?expand=true"
@@ -624,7 +565,6 @@ class App.Messages extends App.Controller
                 App.Messages.ticketArticleIds[ticket.id] = ticket.article_ids
 
             localEl = @renderView(tickets)
-            console.log(localEl)
             @html localEl
 
             for ticket in data
@@ -665,10 +605,10 @@ class App.Messages extends App.Controller
                     recentEmojis: false,
                     events: {
                       keyup: (editor, event) =>
-                        App.Messages.sendMsgByKey(editor, event)
+#                        App.Messages.sendMsgByKey(editor, event)
                     }
                   })
-              , 1000
+              , 1500
             )
           error: =>
             console.log("Failed to initialize")
@@ -792,17 +732,14 @@ class App.Messages extends App.Controller
     )
 
   renderAgentSelectionView: ->
-    console.log("renderAgentSelectionView")
     $.ajax(
       type: 'GET'
       url:  "#{App.Config.get('api_path')}/users?expand=true"
       processData: true,
       success: (users) =>
-        console.log("renderAgentSelectionView-ajax", users)
         ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
         customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
         ticket = App.Messages.tickets[ticketId]
-        console.log("renderAgentSelectionView-ajax-ticket", App.Messages.tickets)
         html = ""
 
         for user in users
@@ -929,6 +866,35 @@ class App.Messages extends App.Controller
       if files.length == 0 and msg != ""
         form_id = App.ControllerForm.formId()
         App.Messages.createArticle(msg, form_id)
+
+  sendMsg: () ->
+    @$('.send-msg').unbind('click')
+    @$('.send-msg').bind(
+      'click'
+      (e) =>
+        ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+        customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
+        articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+
+        if articleTypeId == 1
+          msg = $("#email-body").val()
+          msg = App.Messages.convertTextToHtml(msg)
+        else
+          msg = $("div.emojionearea-editor").html()
+          if typeof msg == 'undefined'
+            msg = $("#emoji-area").val()
+
+        files = []
+        if articleTypeId == 13
+          files = App.Messages.dropzone.getQueuedFiles()
+
+        for file in files
+          App.Messages.dropzone.processFile(file)
+
+        if files.length == 0 and msg != ""
+          form_id = App.ControllerForm.formId()
+          App.Messages.createArticle(msg, form_id)
+    )
 
   sendEmailMsg: () ->
     @$('.send-email').on(
@@ -1067,7 +1033,6 @@ class App.Messages extends App.Controller
     )
 
   @createArticle: (msg, form_id) ->
-    console.log("createArticle", msg, form_id)
     ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
     customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
     articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
@@ -1167,8 +1132,7 @@ class App.Messages extends App.Controller
         console.log("error")
     )
 
-  displayHistory: (ticketId, articleTypeId, pageIndex=App.Messages.pageIndex, perPage=App.Messages.perPage) ->
-    console.log("displayHistory", ticketId, articleTypeId)
+  displayHistory: (ticketId, articleTypeId, pageIndex=App.Messages.pageIndex, perPage=App.Messages.perPage, moveToBottom=true) ->
     ticket = App.Messages.tickets[ticketId]
     currentAgent = App.Messages.users[ticket.owner_id]
     if currentAgent == null || typeof currentAgent == "undefined"
@@ -1204,10 +1168,12 @@ class App.Messages extends App.Controller
       $("#nv-chat").css("display", "none")
       $("#nv-chat-email").css("display", "flex")
       $('.dropzone').css('height', 'calc(100% - 64px - 134px)')
+      @sendEmailMsg()
     else
       $("#nv-chat").css("display", "flex")
       $("#nv-chat-email").css("display", "none")
       $('.dropzone').css('height', 'calc(100% - 64px - 66px)')
+      @sendMsg()
 
     $(".message_board").css("display", "block")
 
@@ -1219,7 +1185,10 @@ class App.Messages extends App.Controller
         $("#ajax_loader").removeClass("hide")
       ,
       success: (data) =>
-        App.Messages.ticketArticleIds[ticketId] = data.ticket_article_ids
+        if typeof data.assets.Ticket == "undefined"
+          $("#ajax_loader").addClass("hide")
+          return
+
         ticket = data.assets.Ticket[ticketId]
 
         articleIds = data.ticket_article_ids
@@ -1242,11 +1211,22 @@ class App.Messages extends App.Controller
             App.Messages.dropzone = undefined
           @hideAudioRecord()
 
+        if moveToBottom
+          @moveToBottom()
         @displayMoreHistories(ticketId, articleTypeId)
+
         $("#ajax_loader").addClass("hide")
       error: =>
         console.log("error")
     )
+
+  moveToBottom: () ->
+    history_view = $(".nv-histories");
+    last_history = $(".nv-histories li:last");
+
+    # 40 is padding top & bottom of history_view
+    if (history_view[0].scrollHeight - 40) > history_view.height()
+      last_history[0].scrollIntoView()
 
   displayMoreHistories: (ticketId, articleTypeId) ->
     thisObj = this
@@ -1256,7 +1236,7 @@ class App.Messages extends App.Controller
       () ->
         if $(this).scrollTop() == 0
           App.Messages.pageIndex += 1
-          thisObj.displayHistory(ticketId, articleTypeId, App.Messages.pageIndex)
+          thisObj.displayHistory(ticketId, articleTypeId, App.Messages.pageIndex, App.Messages.perPage, false)
     )
 
   showAudioRecord: =>

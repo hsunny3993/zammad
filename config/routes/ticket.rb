@@ -20,7 +20,8 @@ Zammad::Application.routes.draw do
   match api_path + '/ticket_merge/:source_ticket_id/:target_ticket_number', to: 'tickets#ticket_merge', via: :put
   match api_path + '/ticket_stats',                                  to: 'tickets#stats',             via: :get
   match api_path + '/tickets_by_customer/:customer_id',              to: 'tickets#tickets_by_customer', via: :get
-  match api_path + '/tickets_articles/:ticket_id',                 to: 'tickets#tickets_articles', via: :get
+  match api_path + '/tickets_articles/:ticket_id',                   to: 'tickets#tickets_articles',  via: :get
+  match api_path + '/ticket_new_articles/:ticket_id',                to: 'tickets#ticket_new_articles', via: :get
 
   # ticket overviews
   match api_path + '/ticket_overview',                               to: 'ticket_overviews#data',     via: :get
