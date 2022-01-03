@@ -12,7 +12,7 @@ class App.Messages extends App.Controller
   @mediaRecorder = {}
   @buffArray = []
   @pageIndex = 0
-  @perPage = 10
+  @perPage = 20
 
   constructor: ->
     super
