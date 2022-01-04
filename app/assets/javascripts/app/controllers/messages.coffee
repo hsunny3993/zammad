@@ -19,6 +19,7 @@ class App.Messages extends App.Controller
 
     # fetch new data if triggered
     @controllerBind('Ticket:update', (data) =>
+      console.log(data)
       @fetchMayBe(data)
     )
 
@@ -79,6 +80,7 @@ class App.Messages extends App.Controller
 
       App.Messages.tickets[data.id].updated_at = data.updated_at
 
+    prevTicketOwner = App.Messages.tickets[data.id].owner_id
     ticketIdWithNewArticles = data.id
     me = App.Session.get('id')
 
@@ -88,6 +90,18 @@ class App.Messages extends App.Controller
       processData: true
       success: (data, status, xhr) =>
         ticket = data.assets.Ticket[ticketIdWithNewArticles]
+
+        # if ticket was closed: 4(pending closed), 5(closed)
+        if ticket.state_id in [4, 5]
+          $("li.nv-item-active[data-ticket-id='#{ticket.id}']").attr("data-ticket-status", "closed")
+          $("li.nv-item-active[data-ticket-id='#{ticket.id}']").css("display", "none")
+          return
+
+        # if ticket was assgined to me
+        if ticket.owner_id == me and prevTicketOwner != ticket.owner_id
+          $("li.nv-item-active[data-ticket-id='#{ticket.id}']").attr("data-mine", "mine")
+          return
+
         App.Messages.users = data.assets.User
         ticket.customer = data.assets.User[ticket.customer_id]
         ticket.owner = data.assets.User[ticket.owner_id]
