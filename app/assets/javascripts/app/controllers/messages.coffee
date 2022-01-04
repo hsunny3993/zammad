@@ -752,6 +752,9 @@ class App.Messages extends App.Controller
       processData: true,
       success: (users) =>
         ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
+        if isNaN(ticketId)
+          return
+
         customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
         ticket = App.Messages.tickets[ticketId]
         html = ""
