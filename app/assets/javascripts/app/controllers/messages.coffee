@@ -1287,7 +1287,6 @@ class App.Messages extends App.Controller
     difference = Math.abs(now - old_time)
     diffDays = Math.floor(difference / (24 * 60 * 60 * 1000))
     diffHours = Math.floor(difference / (60 * 60 * 1000))
-    diffMinutes = Math.floor(difference / (60 * 1000))
 
     if diffDays != 0
 #      return diffDays + "d"
@@ -1302,8 +1301,10 @@ class App.Messages extends App.Controller
 
       return [year, month, day].join('.')
     if diffHours != 0
+      diffMinutes = Math.floor((difference - diffHours * 60 * 60 * 1000) / (60 * 1000))
       return diffHours + "h " + diffMinutes + "m"
     if diffMinutes != 0
+      diffMinutes = Math.floor(difference / (60 * 1000))
       return diffMinutes + "m"
 
     return "1m"
