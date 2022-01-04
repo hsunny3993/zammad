@@ -70,6 +70,7 @@ class App.Messages extends App.Controller
     return content
 
   fetchMayBe: (data) ->
+    prevTicketOwner = undefined
     if App.Messages.tickets[data.id]
       ticketUpdatedAtLastCall = App.Messages.tickets[data.id].updated_at
       if ticketUpdatedAtLastCall
@@ -79,8 +80,8 @@ class App.Messages extends App.Controller
           return
 
       App.Messages.tickets[data.id].updated_at = data.updated_at
+      prevTicketOwner = App.Messages.tickets[data.id].owner_id
 
-    prevTicketOwner = App.Messages.tickets[data.id].owner_id
     ticketIdWithNewArticles = data.id
     me = App.Session.get('id')
 
