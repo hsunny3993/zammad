@@ -77,7 +77,7 @@ returns
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
     callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://4b4f-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://3dbd-23-237-32-34.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -358,19 +358,45 @@ returns
 
     # add image
     if params[:messages][0][:type] == 'image'
-      # find photo with best resolution for us
       photo = params[:messages][0][:image]
 
       # download photo
       photo_result = get_file(params, photo, api_token)
-      body = "<img src=\"data:image/png;base64,#{Base64.strict_encode64(photo_result.body)}\" style=\"width: 100%;\">"
 
+      # body = "<img src=\"data:image/png;base64,#{Base64.strict_encode64(photo_result.body)}\" style=\"width: 100%;\">"
+      # if photo[:caption]
+      #   body += "<br>#{photo[:caption].text2html}"
+      # end
+
+      body = "&nbsp;"
       if photo[:caption]
         body += "<br>#{photo[:caption].text2html}"
       end
-      article.content_type = 'image/*'
+
+      article.content_type = photo[:mime_type]
       article.body         = body
       article.save!
+
+      Store.remove(
+        object: 'Ticket::Article',
+        o_id:   article.id,
+        )
+
+      type = photo[:mime_type].gsub(%r{(.+/)}, '')
+      if type == 'jpeg'
+        type = 'jpg'
+      end
+
+      Store.add(
+        object:      'Ticket::Article',
+        o_id:        article.id,
+        data:        photo_result.body,
+        filename:    "image-#{photo[:id]}.#{type}",
+        preferences: {
+          'Mime-Type' => photo[:mime_type],
+        },
+        )
+
       return article
     end
 
@@ -382,10 +408,8 @@ returns
       document_result = get_file(params, document, api_token)
       if document[:caption]
         body += "#{document[:caption].text2html}"
-      else
-        body += "#{document[:id].text2html}"
       end
-      article.content_type = 'text/html'
+      article.content_type = document[:mime_type]
       article.body         = body
       article.save!
 
@@ -412,11 +436,9 @@ returns
 
       body += if video[:caption]
                 "#{video[:caption].text2html}"
-              else
-                "#{video[:id].text2html}"
               end
       video_result         = get_file(params, video, api_token)
-      article.content_type = 'text/html'
+      article.content_type = video[:mime_type]
       article.body         = body
       article.save!
 
@@ -445,13 +467,11 @@ returns
       body  = '&nbsp;'
 
       if params[:messages][0][:caption]
-        body = "<br>#{params[:messages][0][:caption].text2html}"
-      else
-        body += "#{voice[:id].text2html}"
+        body = "<br>#{voice[:caption].text2html}"
       end
 
       document_result      = get_file(params, voice, api_token)
-      article.content_type = 'text/html'
+      article.content_type = voice[:mime_type]
       article.body         = body
       article.save!
 
@@ -459,11 +479,20 @@ returns
       if voice[:mime_type] == 'audio/mpeg'
         type = 'mp3'
       end
-      if voice[:mime_type] == 'audio/ogg'
+      if voice[:mime_type] == 'audio/ogg; codecs=opus'
         type = 'ogg'
       end
       if voice[:mime_type] == 'audio/vnd.wav'
         type = 'wav'
+      end
+      if voice[:mime_type] == 'audio/aac'
+        type = 'aac'
+      end
+      if voice[:mime_type] == 'audio/amr'
+        type = 'amr'
+      end
+      if voice[:mime_type] == 'audio/mp4'
+        type = 'mp4'
       end
 
       Store.remove(

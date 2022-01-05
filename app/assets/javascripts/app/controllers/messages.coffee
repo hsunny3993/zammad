@@ -364,12 +364,12 @@ class App.Messages extends App.Controller
 
     if msgType? and msgType.startsWith("video")
       mimeHTML = """
-        <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls></video>
+        <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls style="width: 250px;"></video>
       """
 
     if msgType? and msgType.startsWith("image")
       mimeHTML = """
-        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style='width: 300px;'></img></div>
+        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style="width: 250px;"></img></div>
       """
 
     history = """
@@ -439,7 +439,9 @@ class App.Messages extends App.Controller
 
         @$('.nv-items li').removeClass('nv-item-active')
         @$(e.currentTarget).addClass('nv-item-active')
-        $(".emojionearea-editor").text("")
+
+        if typeof App.Messages.emojioneArea != "undefined"
+          App.Messages.emojioneArea.setText("")
 
         ticketId = parseInt($(e.currentTarget).attr('data-ticket-id'))
         articleTypeId = parseInt($(e.currentTarget).attr('data-article-type-id'))
@@ -622,7 +624,7 @@ class App.Messages extends App.Controller
                       keyup: (editor, event) =>
 #                        App.Messages.sendMsgByKey(editor, event)
                     }
-                  })
+                  })[0].emojioneArea
               , 1500
             )
           error: =>
@@ -866,12 +868,14 @@ class App.Messages extends App.Controller
       customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
       articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
 
+      msg = ""
       if articleTypeId == 1
         msg = $("#email-body").val()
         msg = App.Messages.convertTextToHtml(msg)
       else
-        msg = $("div.emojionearea-editor").html()
-        if typeof msg == 'undefined'
+        if typeof App.Messages.emojioneArea != "undefined"
+          msg = App.Messages.emojioneArea.getText()
+        if msg == ''
           msg = $("#emoji-area").val()
 
       files = []
@@ -894,12 +898,14 @@ class App.Messages extends App.Controller
         customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
         articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
 
+        msg = ''
         if articleTypeId == 1
           msg = $("#email-body").val()
           msg = App.Messages.convertTextToHtml(msg)
         else
-          msg = $("div.emojionearea-editor").html()
-          if typeof msg == 'undefined'
+          if typeof App.Messages.emojioneArea != "undefined"
+            msg = App.Messages.emojioneArea.getText()
+          if msg == ''
             msg = $("#emoji-area").val()
 
         files = []
@@ -922,12 +928,14 @@ class App.Messages extends App.Controller
         customerId = parseInt($('li.nv-item-active').attr('data-customer-id'))
         articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
 
+        msg = ''
         if articleTypeId == 1
           msg = $("#email-body").val()
           msg = App.Messages.convertTextToHtml(msg)
         else
-          msg = $("div.emojionearea-editor").html()
-          if typeof msg == 'undefined'
+          if typeof App.Messages.emojioneArea != "undefined"
+            msg = App.Messages.emojioneArea.getText()
+          if msg == ''
             msg = $("#emoji-area").val()
 
         files = []
@@ -967,11 +975,10 @@ class App.Messages extends App.Controller
                 msg = $("#email-body").val()
                 msg = App.Messages.convertTextToHtml(msg)
               else
-                msg = $("div.emojionearea-editor").html()
-                if typeof msg == 'undefined'
+                if typeof App.Messages.emojioneArea != "undefined"
+                  msg = App.Messages.emojioneArea.getText()
+                if msg == ''
                   msg = $("#emoji-area").val()
-#              if msg == ""
-#                msg = response.data.filename
 
               App.Messages.createArticle(msg, response.data.form_id)
             else
@@ -1037,8 +1044,9 @@ class App.Messages extends App.Controller
                 msg = $("#email-body").val()
                 msg = App.Messages.convertTextToHtml(msg)
               else
-                msg = $("div.emojionearea-editor").html()
-                if typeof msg == 'undefined'
+                if typeof App.Messages.emojioneArea != "undefined"
+                  msg = App.Messages.emojioneArea.getText()
+                if msg == ''
                   msg = $("#emoji-area").val()
 
               App.Messages.createArticle(msg, response.data.form_id)
@@ -1143,7 +1151,8 @@ class App.Messages extends App.Controller
         new_state_id = data['assets']['Ticket'][data.ticket_id]['state_id']
         App.Messages.tickets[ticketId].state_id = new_state_id
 
-        $(".emojionearea-editor").text("")
+        if typeof App.Messages.emojioneArea != "undefined"
+          App.Messages.emojioneArea.setText("")
         $("#email-body").val("")
         $("#emoji-area").val("")
       error: =>
@@ -1289,7 +1298,6 @@ class App.Messages extends App.Controller
     diffHours = Math.floor(difference / (60 * 60 * 1000))
 
     if diffDays != 0
-#      return diffDays + "d"
       month = '' + (old_time.getMonth() + 1)
       day = '' + (old_time.getDate())
       year = old_time.getFullYear()
