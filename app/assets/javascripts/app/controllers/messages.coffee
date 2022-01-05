@@ -373,7 +373,7 @@ class App.Messages extends App.Controller
       """
 
     subject_html = ""
-    if article.type_id == 2
+    if article.type_id == 1       # email article
       subject_html = """
         <div>
           #{article.subject}
