@@ -440,8 +440,10 @@ class App.Messages extends App.Controller
         @$('.nv-items li').removeClass('nv-item-active')
         @$(e.currentTarget).addClass('nv-item-active')
 
-        if typeof App.Messages.emojioneArea != "undefined"
+        try
           App.Messages.emojioneArea.setText("")
+        catch e
+          console.log(e)
 
         ticketId = parseInt($(e.currentTarget).attr('data-ticket-id'))
         articleTypeId = parseInt($(e.currentTarget).attr('data-article-type-id'))
@@ -873,8 +875,11 @@ class App.Messages extends App.Controller
         msg = $("#email-body").val()
         msg = App.Messages.convertTextToHtml(msg)
       else
-        if typeof App.Messages.emojioneArea != "undefined"
+        try
           msg = App.Messages.emojioneArea.getText()
+        catch e
+          console.log(e)
+
         if msg == ''
           msg = $("#emoji-area").val()
 
@@ -903,11 +908,15 @@ class App.Messages extends App.Controller
           msg = $("#email-body").val()
           msg = App.Messages.convertTextToHtml(msg)
         else
-          if typeof App.Messages.emojioneArea != "undefined"
+          try
             msg = App.Messages.emojioneArea.getText()
+          catch e
+            console.log(e)
+
           if msg == ''
             msg = $("#emoji-area").val()
 
+        alert(msg)
         files = []
         if articleTypeId == 13
           files = App.Messages.dropzone.getQueuedFiles()
@@ -933,8 +942,11 @@ class App.Messages extends App.Controller
           msg = $("#email-body").val()
           msg = App.Messages.convertTextToHtml(msg)
         else
-          if typeof App.Messages.emojioneArea != "undefined"
+          try
             msg = App.Messages.emojioneArea.getText()
+          catch e
+            console.log(e)
+
           if msg == ''
             msg = $("#emoji-area").val()
 
@@ -975,8 +987,11 @@ class App.Messages extends App.Controller
                 msg = $("#email-body").val()
                 msg = App.Messages.convertTextToHtml(msg)
               else
-                if typeof App.Messages.emojioneArea != "undefined"
+                try
                   msg = App.Messages.emojioneArea.getText()
+                catch e
+                  console.log(e)
+
                 if msg == ''
                   msg = $("#emoji-area").val()
 
@@ -1044,8 +1059,11 @@ class App.Messages extends App.Controller
                 msg = $("#email-body").val()
                 msg = App.Messages.convertTextToHtml(msg)
               else
-                if typeof App.Messages.emojioneArea != "undefined"
+                try
                   msg = App.Messages.emojioneArea.getText()
+                catch e
+                  console.log(e)
+
                 if msg == ''
                   msg = $("#emoji-area").val()
 
@@ -1151,8 +1169,11 @@ class App.Messages extends App.Controller
         new_state_id = data['assets']['Ticket'][data.ticket_id]['state_id']
         App.Messages.tickets[ticketId].state_id = new_state_id
 
-        if typeof App.Messages.emojioneArea != "undefined"
+        try
           App.Messages.emojioneArea.setText("")
+        catch e
+          console.log(e)
+
         $("#email-body").val("")
         $("#emoji-area").val("")
       error: =>
