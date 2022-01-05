@@ -372,13 +372,24 @@ class App.Messages extends App.Controller
         <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style="width: 250px;"></img></div>
       """
 
+    subject_html = ""
+    if article.type_id == 2
+      subject_html = """
+        <div>
+          #{article.subject}
+        </div>
+      """
+
     history = """
       <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
         <span class="nv-avatar avatar-#{article.created_by_id}"></span>
         <div class="nv-history-body">
           <div class="nv-message">
             <div style="display: block; margin-top: 5px; margin-left: 10px; margin-right: 10px;">
-              <div>#{article.body}</div>
+              <div>
+                #{subject_html}
+                #{article.body}
+              </div>
               #{mimeHTML}
             </div>
           </div>
