@@ -86,7 +86,7 @@ class CommunicateWhatsappJob < ApplicationJob
           to: ticket.preferences["customer_phone_number"],
         }
 
-        if ['audio/aac', 'audio/mp4', 'audio/amr', 'audio/mpeg', 'audio/ogg'].include? content_type
+        if ['audio/aac', 'audio/mp4', 'audio/amr', 'audio/mpeg', 'audio/ogg; codecs=opus'].include? content_type
           data['type'] = "audio"
           data['audio'] = { id: media_id }
         end

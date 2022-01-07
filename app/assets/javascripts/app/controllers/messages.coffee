@@ -19,7 +19,6 @@ class App.Messages extends App.Controller
 
     # fetch new data if triggered
     @controllerBind('Ticket:update', (data) =>
-      console.log(data)
       @fetchMayBe(data)
     )
 
@@ -453,11 +452,29 @@ class App.Messages extends App.Controller
 
         try
           App.Messages.emojioneArea.setText("")
-        catch e
-          console.log(e)
+        catch err
+#          console.log(err)
 
         ticketId = parseInt($(e.currentTarget).attr('data-ticket-id'))
         articleTypeId = parseInt($(e.currentTarget).attr('data-article-type-id'))
+
+        if typeof App.Messages.emojioneArea == "undefined"
+          try
+            App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
+              pickerPosition: "top",
+              filtersPosition: "top",
+              tones: false,
+              autocomplete: false,
+              inline: true,
+              hidePickerOnBlur: false,
+              recentEmojis: false,
+              events: {
+                keyup: (editor, event) =>
+#                        App.Messages.sendMsgByKey(editor, event)
+              }
+            })[0].emojioneArea
+          catch error
+#            console.log(error)
 
         App.Messages.pageIndex = 0
         @displayHistory(ticketId, articleTypeId)
@@ -625,19 +642,22 @@ class App.Messages extends App.Controller
             setTimeout(
               () =>
                 if typeof App.Messages.emojioneArea == "undefined"
-                  App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
-                    pickerPosition: "top",
-                    filtersPosition: "top",
-                    tones: false,
-                    autocomplete: false,
-                    inline: true,
-                    hidePickerOnBlur: false,
-                    recentEmojis: false,
-                    events: {
-                      keyup: (editor, event) =>
-#                        App.Messages.sendMsgByKey(editor, event)
-                    }
-                  })[0].emojioneArea
+                  try
+                    App.Messages.emojioneArea = $("#emoji-area").emojioneArea({
+                      pickerPosition: "top",
+                      filtersPosition: "top",
+                      tones: false,
+                      autocomplete: false,
+                      inline: true,
+                      hidePickerOnBlur: false,
+                      recentEmojis: false,
+                      events: {
+                        keyup: (editor, event) =>
+  #                        App.Messages.sendMsgByKey(editor, event)
+                      }
+                    })[0].emojioneArea
+                  catch e
+#                    console.log(e)
               , 1500
             )
           error: =>
@@ -889,7 +909,7 @@ class App.Messages extends App.Controller
         try
           msg = App.Messages.emojioneArea.getText()
         catch e
-          console.log(e)
+#          console.log(e)
 
         if msg == ''
           msg = $("#emoji-area").val()
@@ -922,12 +942,11 @@ class App.Messages extends App.Controller
           try
             msg = App.Messages.emojioneArea.getText()
           catch e
-            console.log(e)
+#            console.log(e)
 
           if msg == ''
             msg = $("#emoji-area").val()
 
-        alert(msg)
         files = []
         if articleTypeId == 13
           files = App.Messages.dropzone.getQueuedFiles()
@@ -956,7 +975,7 @@ class App.Messages extends App.Controller
           try
             msg = App.Messages.emojioneArea.getText()
           catch e
-            console.log(e)
+#            console.log(e)
 
           if msg == ''
             msg = $("#emoji-area").val()
@@ -976,46 +995,49 @@ class App.Messages extends App.Controller
   initFileTransfer: ->
     Dropzone.autoDiscover = false
     if typeof App.Messages.dropzone == "undefined"
-      App.Messages.dropzone = new Dropzone(
-        ".dropzone",
-        {
-          url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
-          thumbnailMethod: 'crop',
-          maxFilesize: 16,
-          parallelUploads: 2,
-          clickable: false,
-          addRemoveLinks: true,
-          autoProcessQueue: false,
-          paramName: "File",
-          headers: {'X-CSRF-Token': App.Ajax.token()}
-          success: (file, response) ->
-            if response.success
-              this.removeFile(file)
+      try
+        App.Messages.dropzone = new Dropzone(
+          ".dropzone",
+          {
+            url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
+            thumbnailMethod: 'crop',
+            maxFilesize: 16,
+            parallelUploads: 2,
+            clickable: false,
+            addRemoveLinks: true,
+            autoProcessQueue: false,
+            paramName: "File",
+            headers: {'X-CSRF-Token': App.Ajax.token()}
+            success: (file, response) ->
+              if response.success
+                this.removeFile(file)
 
-              msg = ""
-              articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
-              if articleTypeId == 1
-                msg = $("#email-body").val()
-                msg = App.Messages.convertTextToHtml(msg)
+                msg = ""
+                articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+                if articleTypeId == 1
+                  msg = $("#email-body").val()
+                  msg = App.Messages.convertTextToHtml(msg)
+                else
+                  try
+                    msg = App.Messages.emojioneArea.getText()
+                  catch e
+#                    console.log(e)
+
+                  if msg == ''
+                    msg = $("#emoji-area").val()
+
+                App.Messages.createArticle(msg, response.data.form_id)
               else
-                try
-                  msg = App.Messages.emojioneArea.getText()
-                catch e
-                  console.log(e)
-
-                if msg == ''
-                  msg = $("#emoji-area").val()
-
-              App.Messages.createArticle(msg, response.data.form_id)
-            else
-              console.log("Failed to send image")
-          accept: (file, done) ->
-            if file.type in ['audio/aac', 'audio/mp4', 'audio/amr', 'audio/mpeg', 'audio/ogg', 'image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/3gpp', 'application/pdf']
-              done()
-            else
-              done("Error! Files of this type are not accepted");
-        }
-      );
+                console.log("Failed to send image")
+            accept: (file, done) ->
+              if file.type in ['audio/aac', 'audio/mp4', 'audio/amr', 'audio/mpeg', 'audio/ogg', 'image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/3gpp', 'application/pdf']
+                done()
+              else
+                done("Error! Files of this type are not accepted");
+          }
+        );
+      catch error
+#        console.log(error)
 
   audioRecordHandler: ->
     audioIN = {
@@ -1024,68 +1046,61 @@ class App.Messages extends App.Controller
     }
     start = document.getElementById('start_record')
     stop = document.getElementById('stop_record')
+    audioContext = new AudioContext()
+    gumStream = undefined
+    encodeAfterRecord = true
 
-    navigator.mediaDevices.getUserMedia(audioIN)
-    .then( (mediaStreamObj) =>
-      dataArray = []
-      mediaRecorder = new MediaRecorder(mediaStreamObj)
-
+    try
       start.addEventListener('click', (ev) =>
-        mediaRecorder.start()
+        Fr.voice.record(false, () =>
+          console.log("recording started")
+        )
         $('#start_record').css("display", "none")
         $('#stop_record').css("display", "block")
       )
 
       stop.addEventListener('click', (ev) =>
-        mediaRecorder.stop()
+        Fr.voice.exportMP3(
+          (blob) =>
+            formData = new window.FormData()
+            formData.append('File', blob, "record_file.mp3")
+
+            $.ajax(
+              url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+    #              maxFilesize: 16,
+              headers: {'X-CSRF-Token': App.Ajax.token()}
+              success: (response) ->
+                if response.success
+                  msg = ""
+                  articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+                  if articleTypeId == 1
+                    msg = $("#email-body").val()
+                    msg = App.Messages.convertTextToHtml(msg)
+                  else
+                    try
+                      msg = App.Messages.emojioneArea.getText()
+                    catch e
+#                      console.log(e)
+
+                    if msg == ''
+                      msg = $("#emoji-area").val()
+
+                  App.Messages.createArticle(msg, response.data.form_id)
+                else
+                  alert("Failed to send record file")
+            )
+        )
+        Fr.voice.stop()
+
         $('#start_record').css("display", "block")
         $('#stop_record').css("display", "none")
       )
-
-      mediaRecorder.ondataavailable = (ev) =>
-        dataArray.push(ev.data)
-
-      mediaRecorder.onstop = (ev) =>
-        audioData = new Blob(
-          dataArray,
-          { 'type': 'audio/mpeg' }
-        )
-        dataArray = []
-        formData = new window.FormData()
-        formData.append('File', audioData, "record_file.mp3")
-
-        $.ajax(
-          url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
-          type: 'POST',
-          data: formData,
-          processData: false,
-          contentType: false,
-#              maxFilesize: 16,
-          headers: {'X-CSRF-Token': App.Ajax.token()}
-          success: (response) ->
-            if response.success
-              msg = ""
-              articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
-              if articleTypeId == 1
-                msg = $("#email-body").val()
-                msg = App.Messages.convertTextToHtml(msg)
-              else
-                try
-                  msg = App.Messages.emojioneArea.getText()
-                catch e
-                  console.log(e)
-
-                if msg == ''
-                  msg = $("#emoji-area").val()
-
-              App.Messages.createArticle(msg, response.data.form_id)
-            else
-              alert("Failed to send record file")
-        )
-    )
-    .catch( (err) =>
-      console.log(err.name, err.message)
-    )
+    catch e
+#      console.log(e)
 
   @createArticle: (msg, form_id) ->
     ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))
@@ -1183,12 +1198,12 @@ class App.Messages extends App.Controller
         try
           App.Messages.emojioneArea.setText("")
         catch e
-          console.log(e)
+#          console.log(e)
 
         $("#email-body").val("")
         $("#emoji-area").val("")
       error: =>
-        console.log("error")
+#        console.log("error")
     )
 
   displayHistory: (ticketId, articleTypeId, pageIndex=App.Messages.pageIndex, perPage=App.Messages.perPage, moveToBottom=true) ->
@@ -1264,6 +1279,7 @@ class App.Messages extends App.Controller
         if @getChannelBadgeTitle(ticket.create_article_type_id) == "WhatsApp"
           @initFileTransfer()
           @showAudioRecord()
+          @audioRecordHandler()
         else
           if typeof App.Messages.dropzone != "undefined"
             App.Messages.dropzone.destroy()
@@ -1276,11 +1292,14 @@ class App.Messages extends App.Controller
 
         $("#ajax_loader").addClass("hide")
       error: =>
-        console.log("error")
+#        console.log("error")
     )
 
   moveToBottom: () ->
     history_view = $(".nv-histories");
+    if history_view.length == 0
+      return
+
     last_history = $(".nv-histories li:last");
 
     # 40 is padding top & bottom of history_view
