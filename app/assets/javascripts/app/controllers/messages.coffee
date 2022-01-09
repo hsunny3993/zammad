@@ -1053,12 +1053,12 @@ class App.Messages extends App.Controller
         microm.record()
         .then(() =>
           console.log("recording started")
+          $('#start_record').css("display", "none")
+          $('#stop_record').css("display", "block")
         )
         .catch(() =>
           alert("Please input your microphone and allow it")
         )
-        $('#start_record').css("display", "none")
-        $('#stop_record').css("display", "block")
       )
 
       stop.addEventListener('click', (ev) =>
