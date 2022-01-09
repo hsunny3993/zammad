@@ -1055,7 +1055,7 @@ class App.Messages extends App.Controller
           console.log("recording started")
         )
         .catch(() =>
-          console.log("error recording")
+          alert("Please input your microphone and allow it")
         )
         $('#start_record').css("display", "none")
         $('#stop_record').css("display", "block")

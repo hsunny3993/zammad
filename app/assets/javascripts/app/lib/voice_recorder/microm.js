@@ -84,8 +84,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * Request browser microphone access and waits for it resolution.
 	   * If the user grant access, Microm will start recording the audio.
-	   * 
-	   * @return {Promise} 
+	   *
+	   * @return {Promise}
 	   */
 
 	  _createClass(Microm, [{
@@ -117,7 +117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Reproduce the player audio.
-	     * 
+	     *
 	     * @return {void}
 	     */
 	  }, {
@@ -128,7 +128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Pauses the player.
-	     * 
+	     *
 	     * @return {void}
 	     */
 	  }, {
@@ -145,7 +145,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *   microm.stop().then(function(mp3) {
 	     *    console.log(mp3.url, mp3.blob);
 	     *   });
-	     *   
+	     *
 	     * @return {Promise} Will be resolved with the mp3.
 	     */
 	  }, {
@@ -168,8 +168,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Returns all mp3 info.
 	     * Right now we are converting the recorded data
 	     * everytime this function it's called.
-	     * 
-	     * @return {Promise} 
+	     *
+	     * @return {Promise}
 	     */
 	  }, {
 	    key: "getMp3",
@@ -181,8 +181,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Blob enconded as Wav.
-	     * 
-	     * @return {Blob} 
+	     *
+	     * @return {Blob}
 	     */
 	  }, {
 	    key: "getWav",
@@ -195,8 +195,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @example
 	     *   microm.getUrl();
 	     *   // Something like --> "blob:http%3A//localhost%3A8090/8b40fc63-8bb7-42e3-9622-9dcc59e5df8f"
-	     *   
-	     * @return {String} 
+	     *
+	     * @return {String}
 	     */
 	  }, {
 	    key: "getUrl",
@@ -207,8 +207,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Blob value of the recorded data.
-	     * 
-	     * @return {Blob} 
+	     *
+	     * @return {Blob}
 	     */
 	  }, {
 	    key: "getBlob",
@@ -219,8 +219,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * ArrayBuffer of the recorded data (raw binary data buffer).
-	     * 
-	     * @return {ArrayBuffer} 
+	     *
+	     * @return {ArrayBuffer}
 	     */
 	  }, {
 	    key: "getBuffer",
@@ -236,7 +236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *   microm.getBase64().then(function(base64) {
 	     *     console.log(base64);
 	     *   });
-	     *   
+	     *
 	     * @return {Promise}
 	     */
 	  }, {
@@ -248,9 +248,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Forces file download.
-	     * 
-	     * @param  {String} fileName 
-	     * 
+	     *
+	     * @param  {String} fileName
+	     *
 	     * @return {void}
 	     */
 	  }, {
@@ -285,9 +285,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Attach an event handler function for event name
-	     * @param  {String} eventName 
-	     * @param  {Function} handler   
-	     * @return {void} 
+	     * @param  {String} eventName
+	     * @param  {Function} handler
+	     * @return {void}
 	     */
 
 	  }, {
@@ -299,8 +299,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    /**
 	     * Remove an event handler
-	     * @param  {String} eventName 
-	     * @return {void}           
+	     * @param  {String} eventName
+	     * @return {void}
 	     */
 	  }, {
 	    key: "off",
@@ -436,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      data.length > 0 && buffer.push(new Int8Array(data));
 
-	      blob = new Blob(buffer, { type: 'audio/mp3' });
+	      blob = new Blob(buffer, { type: 'audio/mpeg' });
 	      url = URL.createObjectURL(blob);
 
 	      this.mp3Resolver({
@@ -471,7 +471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Player = (function () {
 	  /**
-	   * @param  {String} src    
+	   * @param  {String} src
 	   * @param  {Object} microm Microm instance
 	   * @return {void}
 	   */
@@ -2098,7 +2098,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 
-	        // i.e. stop recording when <video> is paused by the user; and auto restart recording 
+	        // i.e. stop recording when <video> is paused by the user; and auto restart recording
 	        // when video is resumed. E.g. yourStream.getVideoTracks()[0].muted = true; // it will auto-stop recording.
 	        mediaRecorder.ignoreMutedMedia = config.ignoreMutedMedia || false;
 
@@ -2132,10 +2132,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 
-	            // When the stream is "ended" set recording to 'inactive' 
-	            // and stop gathering data. Callers should not rely on 
-	            // exactness of the timeSlice value, especially 
-	            // if the timeSlice value is small. Callers should 
+	            // When the stream is "ended" set recording to 'inactive'
+	            // and stop gathering data. Callers should not rely on
+	            // exactness of the timeSlice value, especially
+	            // if the timeSlice value is small. Callers should
 	            // consider timeSlice as a minimum value
 
 	            if (mediaRecorder.state !== 'inactive' && mediaRecorder.state !== 'stopped') {
@@ -2509,20 +2509,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            var view = new DataView(buffer);
 
-	            // RIFF chunk descriptor/identifier 
+	            // RIFF chunk descriptor/identifier
 	            writeUTFBytes(view, 0, 'RIFF');
 
 	            // RIFF chunk length
 	            view.setUint32(4, 44 + interleavedLength * 2, true);
 
-	            // RIFF type 
+	            // RIFF type
 	            writeUTFBytes(view, 8, 'WAVE');
 
-	            // format chunk identifier 
+	            // format chunk identifier
 	            // FMT sub-chunk
 	            writeUTFBytes(view, 12, 'fmt ');
 
-	            // format chunk length 
+	            // format chunk length
 	            view.setUint32(16, 16, true);
 
 	            // sample format (raw)
@@ -2531,23 +2531,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // stereo (2 channels)
 	            view.setUint16(22, numberOfAudioChannels, true);
 
-	            // sample rate 
+	            // sample rate
 	            view.setUint32(24, sampleRate, true);
 
 	            // byte rate (sample rate * block align)
 	            view.setUint32(28, sampleRate * 2, true);
 
-	            // block align (channel count * bytes per sample) 
+	            // block align (channel count * bytes per sample)
 	            view.setUint16(32, numberOfAudioChannels * 2, true);
 
-	            // bits per sample 
+	            // bits per sample
 	            view.setUint16(34, 16, true);
 
 	            // data sub-chunk
-	            // data chunk identifier 
+	            // data chunk identifier
 	            writeUTFBytes(view, 36, 'data');
 
-	            // data chunk length 
+	            // data chunk length
 	            view.setUint32(40, interleavedLength * 2, true);
 
 	            // write the PCM samples
@@ -2961,7 +2961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                throw 'captureStream API are NOT available.';
 	            }
 
-	            // Note: Jan 18, 2016 status is that, 
+	            // Note: Jan 18, 2016 status is that,
 	            // Firefox MediaRecorder API can't record CanvasCaptureMediaStream object.
 	            mediaStreamRecorder = new MediaStreamRecorder(canvasMediaStream, {
 	                mimeType: 'video/webm'
@@ -4208,27 +4208,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // external library to record as GIF images
 	        gifEncoder = new GIFEncoder();
 
-	        // void setRepeat(int iter) 
-	        // Sets the number of times the set of GIF frames should be played. 
+	        // void setRepeat(int iter)
+	        // Sets the number of times the set of GIF frames should be played.
 	        // Default is 1; 0 means play indefinitely.
 	        gifEncoder.setRepeat(0);
 
-	        // void setFrameRate(Number fps) 
-	        // Sets frame rate in frames per second. 
+	        // void setFrameRate(Number fps)
+	        // Sets frame rate in frames per second.
 	        // Equivalent to setDelay(1000/fps).
 	        // Using "setDelay" instead of "setFrameRate"
 	        gifEncoder.setDelay(config.frameRate || 200);
 
-	        // void setQuality(int quality) 
-	        // Sets quality of color quantization (conversion of images to the 
-	        // maximum 256 colors allowed by the GIF specification). 
-	        // Lower values (minimum = 1) produce better colors, 
-	        // but slow processing significantly. 10 is the default, 
-	        // and produces good color mapping at reasonable speeds. 
+	        // void setQuality(int quality)
+	        // Sets quality of color quantization (conversion of images to the
+	        // maximum 256 colors allowed by the GIF specification).
+	        // Lower values (minimum = 1) produce better colors,
+	        // but slow processing significantly. 10 is the default,
+	        // and produces good color mapping at reasonable speeds.
 	        // Values greater than 20 do not yield significant improvements in speed.
 	        gifEncoder.setQuality(config.quality || 10);
 
-	        // Boolean start() 
+	        // Boolean start()
 	        // This writes the GIF Header and returns false if it fails.
 	        gifEncoder.start();
 
@@ -7184,25 +7184,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
 	    as the catch block of a try/catch statement.
-	  
+
 	    ```js
 	    function findAuthor(){
 	      throw new Error('couldn\'t find that author');
 	    }
-	  
+
 	    // synchronous
 	    try {
 	      findAuthor();
 	    } catch(reason) {
 	      // something went wrong
 	    }
-	  
+
 	    // async with promises
 	    findAuthor().catch(function(reason){
 	      // something went wrong
 	    });
 	    ```
-	  
+
 	    @method catch
 	    @param {Function} onRejection
 	    @param {String} label optional string for labeling the promise.
@@ -7218,9 +7218,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	    `finally` will be invoked regardless of the promise's fate just as native
 	    try/catch/finally behaves
-	  
+
 	    Synchronous example:
-	  
+
 	    ```js
 	    findAuthor() {
 	      if (Math.random() > 0.5) {
@@ -7228,7 +7228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      return new Author();
 	    }
-	  
+
 	    try {
 	      return findAuthor(); // succeed or fail
 	    } catch(error) {
@@ -7238,9 +7238,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // doesn't affect the return value
 	    }
 	    ```
-	  
+
 	    Asynchronous example:
-	  
+
 	    ```js
 	    findAuthor().catch(function(reason){
 	      return findOtherAuthor();
@@ -7248,7 +7248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // author was either found, or not
 	    });
 	    ```
-	  
+
 	    @method finally
 	    @param {Function} callback
 	    @param {String} label optional string for labeling the promise.
@@ -8674,7 +8674,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})));
 
 	//# sourceMappingURL=rsvp.map
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), (function() { return this; }())))
 
 /***/ },
@@ -8683,7 +8683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/**
 	 * Returns the same value but the first letter in Uppercase
-	 * @param  {String} str 
+	 * @param  {String} str
 	 * @return {String}
 	 */
 	"use strict";
@@ -9440,7 +9440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/*
 	 *  ReplayGainAnalysis - analyzes input samples and give the recommended dB change
 	 *  Copyright (C) 2001 David Robinson and Glen Sawyer
-	 *  Improvements and optimizations added by Frank Klemm, and by Marcel Muller 
+	 *  Improvements and optimizations added by Frank Klemm, and by Marcel Muller
 	 *
 	 *  This library is free software; you can redistribute it and/or
 	 *  modify it under the terms of the GNU Lesser General Public
@@ -11147,11 +11147,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * the reservoir, and checks to make sure main_data_begin was set properly by
 	 * the formatter<BR>
 	 * Background information:
-	 * 
+	 *
 	 * This is the original text from the ISO standard. Because of sooo many bugs
 	 * and irritations correcting comments are added in brackets []. A '^W' means
 	 * you should remove the last word.
-	 * 
+	 *
 	 * <PRE>
 	 *  1. The following rule can be used to calculate the maximum
 	 *     number of bits used for one granule [^W frame]:<BR>
@@ -11159,9 +11159,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *     per stereo signal [^W^W^W], 48 kHz) the frames must be of
 	 *     [^W^W^W are designed to have] constant length, i.e.
 	 *     one buffer [^W^W the frame] length is:<BR>
-	 * 
+	 *
 	 *         320 kbps * 1152/48 kHz = 7680 bit = 960 byte
-	 * 
+	 *
 	 *     This value is used as the maximum buffer per channel [^W^W] at
 	 *     lower bitrates [than 320 kbps]. At 64 kbps mono or 128 kbps
 	 *     stereo the main granule length is 64 kbps * 576/48 kHz = 768 bit
@@ -11209,22 +11209,22 @@ return /******/ (function(modules) { // webpackBootstrap
 			 *          from the bit reservoir and at most 8*1440 bit from the current
 			 *          frame (320 kbps, 32 kHz), so 8*1951 bit is the largest possible
 			 *          value for MPEG-1 and -2)
-			 * 
+			 *
 			 *          maximum allowed granule/channel size times 4 = 8*2047 bits.,
 			 *          so this is the absolute maximum supported by the format.
-			 * 
-			 * 
+			 *
+			 *
 			 *      fullFrameBits:  maximum number of bits available for encoding
 			 *                      the current frame.
-			 * 
+			 *
 			 *      mean_bits:      target number of bits per granule.
-			 * 
+			 *
 			 *      frameLength:
-			 * 
+			 *
 			 *      gfc.ResvMax:   maximum allowed reservoir
-			 * 
+			 *
 			 *      gfc.ResvSize:  current reservoir size
-			 * 
+			 *
 			 *      l3_side.resvDrain_pre:
 			 *         ancillary data to be added to previous frame:
 			 *         (only usefull in VBR modes if it is possible to have
@@ -11233,10 +11233,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			 *         2010-02-13: RH now enabled, it seems to be needed for CBR too,
 			 *                     as there exists one example, where the FhG decoder
 			 *                     can't decode a -b320 CBR file anymore.
-			 * 
+			 *
 			 *      l3_side.resvDrain_post:
 			 *         ancillary data to be added to this frame:
-			 * 
+			 *
 			 * </PRE>
 			 */
 
@@ -11378,13 +11378,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			 * even possible to use Gabriel's lax buffer consideration again, which
 			 * assumes, any decoder should have a buffer large enough for a 320 kbps
 			 * frame at 32 kHz sample rate.
-			 * 
+			 *
 			 * old drain code: lame -b320 BlackBird.wav --. does not play with
 			 * GraphEdit.exe using FhG decoder V1.5 Build 50
-			 * 
+			 *
 			 * new drain code: lame -b320 BlackBird.wav --. plays fine with
 			 * GraphEdit.exe using FhG decoder V1.5 Build 50
-			 * 
+			 *
 			 * Robert Hegemann, 2010-02-13.
 			 */
 			/*
@@ -26007,7 +26007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  return i
 	}
-	
+
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12).Buffer, (function() { return this; }())))
 
 /***/ },
