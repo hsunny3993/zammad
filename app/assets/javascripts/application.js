@@ -44,8 +44,7 @@
 
 //= require ./app/lib/emojionearea/emojionearea.js
 //= require ./app/lib/dropzone/dropzone.js
-//= require ./app/lib/voice_recorder/recorder.js
-//= require app/lib/voice_recorder/jquery.voice.js
+//= require ./app/lib/voice_recorder/microm.js
 
 //= require_tree ./app/lib/base
 

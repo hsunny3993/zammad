@@ -138,6 +138,7 @@ module Zammad
       IPAddr.new("::/0"),             # All IPv6 addresses.
       "localhost",                         # The localhost reserved domain.
       "zmd5.voipe.cc",                     # The zmd5.voipe.cc reserved domain.
+      "9b21-82-103-129-80.ngrok.io",       # The ngrok reserved domain.
     ]
   end
 end

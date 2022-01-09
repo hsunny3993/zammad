@@ -9,7 +9,6 @@ class App.Messages extends App.Controller
   @channelType = undefined
   @ticketUpdatedAtLastCall = undefined
   @emojioneArea = undefined
-  @mediaRecorder = {}
   @buffArray = []
   @pageIndex = 0
   @perPage = 20
@@ -623,7 +622,6 @@ class App.Messages extends App.Controller
             @ticketClickHandler()
             @historyClickHandler()
             @responsiveHandler()
-            @audioRecordHandler()
 
             if @permissionCheck('admin') || @permissionCheck('agent')
               @tabClickHandler()
@@ -1046,55 +1044,59 @@ class App.Messages extends App.Controller
     }
     start = document.getElementById('start_record')
     stop = document.getElementById('stop_record')
-    audioContext = new AudioContext()
-    gumStream = undefined
-    encodeAfterRecord = true
+
+    microm = new Microm();
+    mp3 = null;
 
     try
       start.addEventListener('click', (ev) =>
-        Fr.voice.record(false, () =>
+        microm.record()
+        .then(() =>
           console.log("recording started")
+        )
+        .catch(() =>
+          console.log("error recording")
         )
         $('#start_record').css("display", "none")
         $('#stop_record').css("display", "block")
       )
 
       stop.addEventListener('click', (ev) =>
-        Fr.voice.exportMP3(
-          (blob) =>
-            formData = new window.FormData()
-            formData.append('File', blob, "record_file.mp3")
+        microm.stop().then((result) =>
+          mp3 = result
 
-            $.ajax(
-              url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
-              type: 'POST',
-              data: formData,
-              processData: false,
-              contentType: false,
-    #              maxFilesize: 16,
-              headers: {'X-CSRF-Token': App.Ajax.token()}
-              success: (response) ->
-                if response.success
-                  msg = ""
-                  articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
-                  if articleTypeId == 1
-                    msg = $("#email-body").val()
-                    msg = App.Messages.convertTextToHtml(msg)
-                  else
-                    try
-                      msg = App.Messages.emojioneArea.getText()
-                    catch e
+          formData = new window.FormData()
+          formData.append('File', mp3.blob, "record_file.mp3")
+
+          $.ajax(
+            url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+#              maxFilesize: 16,
+            headers: {'X-CSRF-Token': App.Ajax.token()}
+            success: (response) ->
+              if response.success
+                msg = ""
+                articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+                if articleTypeId == 1
+                  msg = $("#email-body").val()
+                  msg = App.Messages.convertTextToHtml(msg)
+                else
+                  try
+                    msg = App.Messages.emojioneArea.getText()
+                  catch e
 #                      console.log(e)
 
-                    if msg == ''
-                      msg = $("#emoji-area").val()
+                  if msg == ''
+                    msg = $("#emoji-area").val()
 
-                  App.Messages.createArticle(msg, response.data.form_id)
-                else
-                  alert("Failed to send record file")
-            )
+                App.Messages.createArticle(msg, response.data.form_id)
+              else
+                alert("Failed to send record file")
+          )
         )
-        Fr.voice.stop()
 
         $('#start_record').css("display", "block")
         $('#stop_record').css("display", "none")

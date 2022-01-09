@@ -58,6 +58,7 @@ class ChannelsWhatsappController < ApplicationController
   end
 
   def webhook
+    Rails.logger.info { "############### NEW MESSAGE FROM WA ################" }
     Rails.logger.debug { params['callback_token'] }
     raise Exceptions::UnprocessableEntity, 'callback_token is missing' if params['callback_token'].blank?
 
