@@ -366,8 +366,13 @@ class App.Messages extends App.Controller
       """
 
     if msgType? and msgType.startsWith("image")
+      if msgType == "image/webp"
+        width = "50px"
+      else
+        width = "250px"
+
       mimeHTML = """
-        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style="width: 250px;"></img></div>
+        <div><img src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" style="width: #{width};"></img></div>
       """
 
     subject_html = ""
@@ -378,15 +383,20 @@ class App.Messages extends App.Controller
         </div>
       """
 
+    if article.body == "&nbsp;"
+      body = ""
+    else
+      body = article.body
+
     history = """
       <li class="nv-history nv-#{inboundClass}"  id="#{article.id}">
         <span class="nv-avatar avatar-#{article.created_by_id}"></span>
         <div class="nv-history-body">
           <div class="nv-message">
-            <div style="display: block; margin-top: 5px; margin-left: 10px; margin-right: 10px;">
+            <div style="display: block; margin-top: 5px; margin-left: 10px; margin-right: 10px; margin-bottom: 5px;">
               <div>
                 #{subject_html}
-                #{article.body}
+                #{body}
               </div>
               #{mimeHTML}
             </div>
@@ -1042,64 +1052,69 @@ class App.Messages extends App.Controller
       audio: true,
       video: false
     }
-    start = document.getElementById('start_record')
-    stop = document.getElementById('stop_record')
 
     microm = new Microm();
     mp3 = null;
 
     try
-      start.addEventListener('click', (ev) =>
-        microm.record()
-        .then(() =>
-          console.log("recording started")
-          $('#start_record').css("display", "none")
-          $('#stop_record').css("display", "block")
-        )
-        .catch(() =>
-          alert("Please input your microphone and allow it")
-        )
+      @$('#start_record').unbind('click')
+      @$('#start_record').bind(
+        'click'
+        (e) =>
+          microm.record()
+          .then(() =>
+            console.log("recording started")
+            $('#start_record').css("display", "none")
+            $('#stop_record').css("display", "block")
+          )
+          .catch(() =>
+            alert("Please input your microphone and allow it")
+          )
       )
 
-      stop.addEventListener('click', (ev) =>
-        microm.stop().then((result) =>
-          mp3 = result
+      @$('#stop_record').unbind('click')
+      @$('#stop_record').bind(
+        'click'
+        (e) =>
+          microm.stop()
+          .then((result) =>
+            mp3 = result
 
-          formData = new window.FormData()
-          formData.append('File', mp3.blob, "record_file.mp3")
+            formData = new window.FormData()
+            formData.append('File', mp3.blob, "record_file.mp3")
 
-          $.ajax(
-            url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-#              maxFilesize: 16,
-            headers: {'X-CSRF-Token': App.Ajax.token()}
-            success: (response) ->
-              if response.success
-                msg = ""
-                articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
-                if articleTypeId == 1
-                  msg = $("#email-body").val()
-                  msg = App.Messages.convertTextToHtml(msg)
+            $.ajax(
+              url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+  #              maxFilesize: 16,
+              headers: {'X-CSRF-Token': App.Ajax.token()}
+              success: (response) ->
+                if response.success
+                  msg = ""
+                  articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+                  if articleTypeId == 1
+                    msg = $("#email-body").val()
+                    msg = App.Messages.convertTextToHtml(msg)
+                  else
+                    try
+                      msg = App.Messages.emojioneArea.getText()
+                    catch e
+  #                      console.log(e)
+
+                    if msg == ''
+                      msg = $("#emoji-area").val()
+
+                  App.Messages.createArticle(msg, response.data.form_id)
                 else
-                  try
-                    msg = App.Messages.emojioneArea.getText()
-                  catch e
-#                      console.log(e)
-
-                  if msg == ''
-                    msg = $("#emoji-area").val()
-
-                App.Messages.createArticle(msg, response.data.form_id)
-              else
-                alert("Failed to send record file")
+                  alert("Failed to send record file")
+            )
           )
-        )
 
-        $('#start_record').css("display", "block")
-        $('#stop_record').css("display", "none")
+          $('#start_record').css("display", "block")
+          $('#stop_record').css("display", "none")
       )
     catch e
 #      console.log(e)

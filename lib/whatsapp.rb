@@ -77,7 +77,7 @@ returns
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
     callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://9b21-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://5a3f-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -514,41 +514,30 @@ returns
     # add sticker
     if params[:messages][0][:sticker]
       sticker = params[:messages][0][:sticker]
-      emoji   = sticker[:emoji]
-      thumb   = sticker[:thumb]
-      body    = '&nbsp;'
 
-      if thumb
-        width  = thumb[:width]
-        height = thumb[:height]
-        thumb_result = get_file(params, thumb, api_token)
-        body = "<img style=\"width:#{width}px;height:#{height}px;\" src=\"data:image/webp;base64,#{Base64.strict_encode64(thumb_result.body)}\">"
-        article.content_type = 'text/html'
-      elsif emoji
-        article.content_type = 'text/plain'
-        body = emoji
-      end
+      body = '&nbsp;'
+      sticker_result = get_file(params, sticker, api_token)
 
+      article.content_type = sticker[:mime_type]
       article.body = body
       article.save!
 
-      if sticker[:file_id]
+      Store.remove(
+        object: 'Ticket::Article',
+        o_id:   article.id,
+      )
 
-        document_result = get_file(params, sticker, api_token)
-        Store.remove(
-          object: 'Ticket::Article',
-          o_id:   article.id,
-          )
-        Store.add(
-          object:      'Ticket::Article',
-          o_id:        article.id,
-          data:        document_result.body,
-          filename:    sticker[:file_name] || "#{sticker[:set_name]}.webp",
-          preferences: {
-            'Mime-Type' => 'image/webp', # mime type is not given from Whatsapp API but this is actually WebP
-          },
-          )
-      end
+      type = sticker[:mime_type].gsub(%r{(.+/)}, '')
+
+      Store.add(
+        object:      'Ticket::Article',
+        o_id:        article.id,
+        data:        sticker_result.body,
+        filename:    "#{sticker[:metadata]["sticker-pack-id"]}.#{type}",
+        preferences: {
+          'Mime-Type' => sticker[:mime_type],
+        },
+      )
       return article
     end
 
