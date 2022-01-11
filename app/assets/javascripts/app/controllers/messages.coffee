@@ -362,7 +362,12 @@ class App.Messages extends App.Controller
 
     if msgType? and msgType.startsWith("video")
       mimeHTML = """
+        <!--<video style="width: 250px;" src="https://www.easy-bits.com/videos/iphone-inline-video-autostart.mp4" autoplay playsinline loop muted ></video>-->
+        <!--<video id="video_#{article.id}" style="width: 250px;" src="#{article.attachments[0]['file_path']}" controls></video>-->
         <video src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" controls style="width: 250px;"></video>
+        <!--<video style="width: 250px;" controls>
+          <source src="#{App.Config.get('api_path')}/ticket_attachment/#{article.ticket_id}/#{article.id}/#{attachmentId}?view=preview" type="video/mp4">
+        </video>-->
       """
 
     if msgType? and msgType.startsWith("image")

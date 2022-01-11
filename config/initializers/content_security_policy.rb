@@ -39,7 +39,7 @@ Rails.application.config.content_security_policy do |policy|
   policy.object_src  :none
   policy.script_src  :self, :unsafe_eval, :strict_dynamic
   policy.style_src   :self, :unsafe_inline, 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'
-  policy.media_src   :self, :data, 'zmd5.voipe.cc'
+  policy.media_src   '*', :data
   policy.frame_src   'www.youtube.com', 'player.vimeo.com', '192.168.2.126:4000', 'zmd5.voipe.cc'
   policy.connect_src :self, :ws, :wss, 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'
 end
