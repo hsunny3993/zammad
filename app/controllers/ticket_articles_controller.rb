@@ -212,7 +212,7 @@ class TicketArticlesController < ApplicationController
       # disposition: download_file.disposition,
       disposition: 'inline',
       stream:      true,
-      buffer_size: 4096
+      buffer_size: 8192
     )
   end
 
