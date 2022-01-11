@@ -77,7 +77,7 @@ returns
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
     callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://5a3f-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://2b1a-23-237-32-34.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -368,9 +368,12 @@ returns
       #   body += "<br>#{photo[:caption].text2html}"
       # end
 
-      body = "&nbsp;"
-      if photo[:caption]
-        body += "<br>#{photo[:caption].text2html}"
+      begin
+        if photo[:caption]
+          body += "<br>#{photo[:caption].text2html}"
+        end
+      rescue
+        body = "&nbsp;"
       end
 
       article.content_type = photo[:mime_type]
@@ -403,12 +406,16 @@ returns
     # add document
     if params[:messages][0][:type] == 'document'
       document = params[:messages][0][:document]
-      body     = '&nbsp;'
-
       document_result = get_file(params, document, api_token)
-      if document[:caption]
-        body += "#{document[:caption].text2html}"
+
+      begin
+        if document[:caption]
+          body += "#{document[:caption].text2html}"
+        end
+      rescue
+        body = '&nbsp;'
       end
+
       article.content_type = document[:mime_type]
       article.body         = body
       article.save!
@@ -432,11 +439,14 @@ returns
     # add video
     if params[:messages][0][:type] == 'video'
       video = params[:messages][0][:video]
-      body = '&nbsp;'
 
-      body += if video[:caption]
-                "#{video[:caption].text2html}"
-              end
+      begin
+        body += if video[:caption]
+                  "#{video[:caption].text2html}"
+                end
+      rescue
+        body = '&nbsp;'
+      end
       video_result         = get_file(params, video, api_token)
       article.content_type = video[:mime_type]
       article.body         = body
@@ -464,10 +474,13 @@ returns
     # add voice
     if params[:messages][0][:type] == 'voice'
       voice = params[:messages][0][:voice]
-      body  = '&nbsp;'
 
-      if params[:messages][0][:caption]
-        body = "<br>#{voice[:caption].text2html}"
+      begin
+        if params[:messages][0][:caption]
+          body = "<br>#{voice[:caption].text2html}"
+        end
+      rescue
+        body  = '&nbsp;'
       end
 
       document_result      = get_file(params, voice, api_token)
