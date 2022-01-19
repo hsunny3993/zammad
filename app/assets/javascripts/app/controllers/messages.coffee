@@ -12,6 +12,9 @@ class App.Messages extends App.Controller
   @buffArray = []
   @pageIndex = 0
   @perPage = 20
+  @microm = new Microm();
+  @mediaRecorder = undefined
+  @audioArray = []
 
   constructor: ->
     super
@@ -1050,79 +1053,82 @@ class App.Messages extends App.Controller
           }
         );
       catch error
-#        console.log(error)
+        # console.log(error)
+
+  isIOSDevice: ->
+    return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+
+  startRecording: ->
+    App.Messages.microm.record()
+    .then(() =>
+      $('#start_record').css("display", "none")
+      $('#stop_record').css("display", "block")
+    )
+    .catch(() =>
+      alert("Please input your microphone and allow it")
+    )
+
+  stopRecording: ->
+    App.Messages.microm.stop()
+    .then((result) =>
+      mp3 = result
+
+      formData = new window.FormData()
+      formData.append('File', mp3.blob, "record_file.mp3")
+
+      $.ajax(
+        url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        # maxFilesize: 16,
+        headers: {'X-CSRF-Token': App.Ajax.token()}
+        success: (response) ->
+          if response.success
+            msg = ""
+            articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
+            if articleTypeId == 1
+              msg = $("#email-body").val()
+              msg = App.Messages.convertTextToHtml(msg)
+            else
+              try
+                msg = App.Messages.emojioneArea.getText()
+              catch e
+                # console.log(e)
+
+              if msg == ''
+                msg = $("#emoji-area").val()
+
+            App.Messages.createArticle(msg, response.data.form_id)
+          else
+            alert("Failed to send record file")
+      )
+
+      $('#start_record').css("display", "block")
+      $('#stop_record').css("display", "none")
+    )
+    .catch((e) =>
+      alert("failed stop")
+    )
 
   audioRecordHandler: ->
-    audioIN = {
-      audio: true,
-      video: false
-    }
-
-    microm = new Microm();
-    mp3 = null;
-
     try
       @$('#start_record').unbind('click')
       @$('#start_record').bind(
         'click'
         (e) =>
-          microm.record()
-          .then(() =>
-            console.log("recording started")
-            $('#start_record').css("display", "none")
-            $('#stop_record').css("display", "block")
-          )
-          .catch(() =>
-            alert("Please input your microphone and allow it")
-          )
+          @startRecording()
       )
 
       @$('#stop_record').unbind('click')
       @$('#stop_record').bind(
         'click'
         (e) =>
-          microm.stop()
-          .then((result) =>
-            mp3 = result
-
-            formData = new window.FormData()
-            formData.append('File', mp3.blob, "record_file.mp3")
-
-            $.ajax(
-              url: "#{App.Config.get('api_path')}/upload_caches/#{App.ControllerForm.formId()}",
-              type: 'POST',
-              data: formData,
-              processData: false,
-              contentType: false,
-  #              maxFilesize: 16,
-              headers: {'X-CSRF-Token': App.Ajax.token()}
-              success: (response) ->
-                if response.success
-                  msg = ""
-                  articleTypeId = parseInt($('li.nv-item-active').attr('data-article-type-id'))
-                  if articleTypeId == 1
-                    msg = $("#email-body").val()
-                    msg = App.Messages.convertTextToHtml(msg)
-                  else
-                    try
-                      msg = App.Messages.emojioneArea.getText()
-                    catch e
-  #                      console.log(e)
-
-                    if msg == ''
-                      msg = $("#emoji-area").val()
-
-                  App.Messages.createArticle(msg, response.data.form_id)
-                else
-                  alert("Failed to send record file")
-            )
-          )
-
-          $('#start_record').css("display", "block")
-          $('#stop_record').css("display", "none")
+          @stopRecording()
       )
     catch e
-#      console.log(e)
+      console.log(e)
 
   @createArticle: (msg, form_id) ->
     ticketId = parseInt($('li.nv-item-active').attr('data-ticket-id'))

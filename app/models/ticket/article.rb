@@ -303,6 +303,21 @@ returns
 
   def add_attachments_to_attributes(attributes)
     attributes['attachments'] = attachments.map(&:attributes_for_display)
+
+    new_attachments = []
+    attributes['attachments'].each do |attachment|
+      store_data = Store.lookup(id: attachment[:id])
+      file = Store::File.lookup(id: store_data[:store_file_id]) # lookup the file by attributes you have or ID
+      file_path = Store::Provider::File.get_location(file[:sha]) # => /opt/zammad/storage/fs/2de0/44e8/51a50/dabc4/4c9babd/d3948c8/318b6aea7badeac5f2b91c17360f3877
+
+      # remove rails's root path
+      file_path = file_path.to_s.split("#{Rails.root.to_s}/storage/fs/")[1]
+
+      attachment[:file_path] = "attachments/#{file_path}"
+
+      new_attachments.push attachment
+    end
+
     attributes
   end
 

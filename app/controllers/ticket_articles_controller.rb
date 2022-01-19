@@ -175,23 +175,6 @@ class TicketArticlesController < ApplicationController
     end
     raise Exceptions::Forbidden, 'Requested file id is not linked with article_id.' if !access
 
-    if params[:article_id] == '78'
-      ttt = 'string'
-    else
-      # size = download_file.size.to_i
-      # bytes = if request.get_header('HTTP_RANGE').nil?
-      #           Rack::Utils.get_byte_ranges('bytes=0-', size)[0]
-      #         else
-      #           Rack::Utils.get_byte_ranges(request.get_header('HTTP_RANGE'), size)[0]
-      #         end
-      #
-      # length = bytes.end - bytes.begin + 1
-      #
-      # response.header['Accept-Ranges'] = 'bytes'
-      # response.header['Content-Range'] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
-      # response.header['Content-Length'] = length.to_s
-    end
-
     size = download_file.size.to_i
     bytes = if request.get_header('HTTP_RANGE').nil?
               Rack::Utils.get_byte_ranges('bytes=0-', size)[0]

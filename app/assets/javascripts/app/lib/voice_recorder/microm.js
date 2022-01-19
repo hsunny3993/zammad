@@ -110,7 +110,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            self.player = new Player(mp3.url, self);
 
 	            resolve(mp3);
-	          });
+	          }).catch(function (e) {
+	            alert(e)
+            });
 	        });
 	      });
 	    }
@@ -268,19 +270,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	      link.dispatchEvent(click);
 	    }
 	  }, {
-	    key: "startUserMedia",
-	    value: function startUserMedia(stream) {
-	      var recordRTC = RecordRTC(stream, { type: 'audio' });
-	      recordRTC.startRecording();
-
-	      this.recordRTC = recordRTC;
-	      this.isRecording = true;
-
-	      return stream;
+	    key: "getSupportedMimeTypes",
+	    value: function getSupportedMimeTypes(media, types, codecs) {
+        const isSupported = MediaRecorder.isTypeSupported;
+        const supported = [];
+        types.forEach((type) => {
+          const mimeType = `${media}/${type}`;
+          codecs.forEach((codec) => [
+            `${mimeType};codecs=${codec}`,
+            `${mimeType};codecs:${codec}`,
+            `${mimeType};codecs=${codec.toUpperCase()}`,
+            `${mimeType};codecs:${codec.toUpperCase()}`
+          ].forEach(variation => {
+            if(isSupported(variation))
+              supported.push(variation);
+          }));
+          if (isSupported(mimeType))
+            supported.push(mimeType);
+        });
+        return supported;
 	    }
 	  }, {
+      key: "startUserMedia",
+      value: function startUserMedia(stream) {
+        const videoTypes = ["webm", "ogg", "mp4", "x-matroska"];
+        const audioTypes = ["webm", "ogg", "mp3", "x-matroska", "ogg", "opus", "mpeg", "mp4", "aac", "asc", "mpeg4-generic", "vorbis"];
+        const codecs = ["vp9", "vp9.0", "vp8", "vp8.0", "avc1", "av1", "h265", "h.265", "h264", "h.264", "opus", "pcm", "aac", "mpeg", "mp4a"];
+
+        const supportedVideos = this.getSupportedMimeTypes("video", videoTypes, codecs);
+        const supportedAudios = this.getSupportedMimeTypes("audio", audioTypes, codecs);
+
+        // console.log('-- Top supported Video : ' + supportedVideos[0])
+        // console.log('-- Top supported Audio : ' + supportedAudios[0])
+        // console.log('-- All supported Videos : ' + supportedVideos.toString())
+        // console.log('-- All supported Audios : ' + supportedAudios.toString())
+
+        var recordRTC = RecordRTC(stream, { type: 'audio', mimeType: 'audio/mp4', numberOfAudioChannels:2 });
+        recordRTC.startRecording();
+
+        this.recordRTC = recordRTC;
+        this.isRecording = true;
+
+        return stream;
+      }
+    }, {
 	    key: "onUserMediaError",
-	    value: function onUserMediaError() {}
+	    value: function onUserMediaError(e) {
+	      alert(e)
+      }
 	    // TODO: Handle recording error
 
 	    /**
@@ -376,8 +413,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'onBlobReady',
 	    value: function onBlobReady(converter) {
 	      var blobResult = this.result;
-	      var samples = new Int16Array(blobResult);
+	      // var samples = new Int16Array(blobResult);
 	      var wav = converter.lame.WavHeader.readHeader(new DataView(blobResult));
+
+        var samples;
+        try {
+          samples = new Int16Array(blobResult, wav.dataOffset, wav.dataLen / 2);
+        } catch(error) {
+          alert(error)
+        }
 
 	      if (wav.channels === channels.stereo) {
 	        var left = [],
@@ -437,12 +481,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      data.length > 0 && buffer.push(new Int8Array(data));
 
 	      blob = new Blob(buffer, { type: 'audio/mpeg' });
-	      url = URL.createObjectURL(blob);
+	      // url = URL.createObjectURL(blob);
 
 	      this.mp3Resolver({
 	        buffer: buffer,
 	        blob: blob,
-	        url: url
+	        // url: url
 	      });
 	    }
 	  }]);
@@ -1337,13 +1381,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // StereoAudioRecorder can work with all three: Edge, Firefox and Chrome
 	    // todo: detect if it is Edge, then auto use: StereoAudioRecorder
-	    if (isChrome || isEdge || isOpera) {
+	    if (isChrome || isEdge || isOpera || isIOS) {
 	        // Media Stream Recording API has not been implemented in chrome yet;
 	        // That's why using WebAudio API to record stereo audio in WAV format
 	        recorder = StereoAudioRecorder;
 	    }
 
-	    if (typeof MediaRecorder !== 'undefined' && 'requestData' in MediaRecorder.prototype && !isChrome) {
+	    if (typeof MediaRecorder !== 'undefined' && 'requestData' in MediaRecorder.prototype && !isChrome && !isIOS) {
 	        recorder = MediaStreamRecorder;
 	    }
 
@@ -1797,7 +1841,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var isEdge = navigator.userAgent.indexOf('Edge') !== -1 && (!!navigator.msSaveBlob || !!navigator.msSaveOrOpenBlob);
 	var isOpera = !!window.opera || navigator.userAgent.indexOf('OPR/') !== -1;
-	var isChrome = !isOpera && !isEdge && !!navigator.webkitGetUserMedia;
+	// var isChrome = !isOpera && !isEdge && !!navigator.webkitGetUserMedia;
+  var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  var isIOS = /Safari/.test(navigator.userAgent) && /Apple Computer, Inc/.test(navigator.vendor);
 
 	var MediaStream = window.MediaStream;
 
