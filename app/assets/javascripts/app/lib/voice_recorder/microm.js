@@ -270,41 +270,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      link.dispatchEvent(click);
 	    }
 	  }, {
-	    key: "getSupportedMimeTypes",
-	    value: function getSupportedMimeTypes(media, types, codecs) {
-        const isSupported = MediaRecorder.isTypeSupported;
-        const supported = [];
-        types.forEach((type) => {
-          const mimeType = `${media}/${type}`;
-          codecs.forEach((codec) => [
-            `${mimeType};codecs=${codec}`,
-            `${mimeType};codecs:${codec}`,
-            `${mimeType};codecs=${codec.toUpperCase()}`,
-            `${mimeType};codecs:${codec.toUpperCase()}`
-          ].forEach(variation => {
-            if(isSupported(variation))
-              supported.push(variation);
-          }));
-          if (isSupported(mimeType))
-            supported.push(mimeType);
-        });
-        return supported;
-	    }
-	  }, {
       key: "startUserMedia",
       value: function startUserMedia(stream) {
-        const videoTypes = ["webm", "ogg", "mp4", "x-matroska"];
-        const audioTypes = ["webm", "ogg", "mp3", "x-matroska", "ogg", "opus", "mpeg", "mp4", "aac", "asc", "mpeg4-generic", "vorbis"];
-        const codecs = ["vp9", "vp9.0", "vp8", "vp8.0", "avc1", "av1", "h265", "h.265", "h264", "h.264", "opus", "pcm", "aac", "mpeg", "mp4a"];
-
-        const supportedVideos = this.getSupportedMimeTypes("video", videoTypes, codecs);
-        const supportedAudios = this.getSupportedMimeTypes("audio", audioTypes, codecs);
-
-        // console.log('-- Top supported Video : ' + supportedVideos[0])
-        // console.log('-- Top supported Audio : ' + supportedAudios[0])
-        // console.log('-- All supported Videos : ' + supportedVideos.toString())
-        // console.log('-- All supported Audios : ' + supportedAudios.toString())
-
         var recordRTC = RecordRTC(stream, { type: 'audio', mimeType: 'audio/mp4', numberOfAudioChannels:2 });
         recordRTC.startRecording();
 
