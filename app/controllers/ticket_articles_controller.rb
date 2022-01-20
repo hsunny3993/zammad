@@ -175,18 +175,28 @@ class TicketArticlesController < ApplicationController
     end
     raise Exceptions::Forbidden, 'Requested file id is not linked with article_id.' if !access
 
-    size = download_file.size.to_i
-    bytes = if request.get_header('HTTP_RANGE').nil?
-              Rack::Utils.get_byte_ranges('bytes=0-', size)[0]
-            else
-              Rack::Utils.get_byte_ranges(request.get_header('HTTP_RANGE'), size)[0]
-            end
+    file_begin = 0
+    file_size = download_file.size.to_i
+    file_end = file_size - 1
 
-    length = bytes.end - bytes.begin + 1
+    if request.headers['Range']
+      status_code = '206 Partial Content'
+      match = request.headers['range'].match(/bytes=(\d+)-(\d*)/)
+      if match
+        # file_begin = match[1]
+        file_end = match[2] if match[2] && !match[2].empty?
+      end
+      response.header['Content-Range'] = 'bytes ' + file_begin.to_s + '-' + file_end.to_s + '/' + file_size.to_s
+    else
+      status_code = '200 OK'
+    end
+    response.header['Content-Length'] = (file_end.to_i - file_begin.to_i + 1).to_s
+    response.header['Last-Modified'] = download_file.updated_at.to_s
 
+    response.header['Cache-Control'] = 'public, must-revalidate, max-age=0'
+    response.header['Pragma'] = 'no-cache'
     response.header['Accept-Ranges'] = 'bytes'
-    response.header['Content-Range'] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
-    response.header['Content-Length'] = length.to_s
+    response.header['Content-Transfer-Encoding'] = 'binary'
 
     send_data(
       download_file.content(params[:view]),
@@ -194,8 +204,9 @@ class TicketArticlesController < ApplicationController
       type:        download_file.content_type,
       # disposition: download_file.disposition,
       disposition: 'inline',
-      stream:      true,
-      buffer_size: 8192
+      status:      status_code,
+      stream:      'true',
+      buffer_size: 4096
     )
   end
 
