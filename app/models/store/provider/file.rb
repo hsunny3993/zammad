@@ -12,7 +12,7 @@ class Store::Provider::File
       File.binwrite(location, data)
     end
 
-    File.chmod(0o600, location)
+    File.chmod(0o644, location)
 
     validate_file(sha)
   rescue # .validate_file will raise an error if contents do not match SHA
