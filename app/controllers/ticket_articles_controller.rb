@@ -198,8 +198,23 @@ class TicketArticlesController < ApplicationController
     response.header['Accept-Ranges'] = 'bytes'
     response.header['Content-Transfer-Encoding'] = 'binary'
 
-    send_data(
-      download_file.content(params[:view]),
+    store_file = Store::File.find(download_file[:store_file_id])
+    sha = store_file[:sha]
+    file_path = "#{Store::Provider::File.get_location(sha)}"
+
+    # send_data(
+    #   download_file.content(params[:view]),
+    #   filename:    download_file.filename,
+    #   type:        download_file.content_type,
+    #   # disposition: download_file.disposition,
+    #   disposition: 'inline',
+    #   status:      status_code,
+    #   stream:      'true',
+    #   buffer_size: 4096
+    # )
+
+    send_file(
+      file_path,
       filename:    download_file.filename,
       type:        download_file.content_type,
       # disposition: download_file.disposition,
