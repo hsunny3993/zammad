@@ -8,10 +8,11 @@ class Store::Provider::File
 
     # write file to file system
     if !File.exist?(location)
-      Rails.logger.debug { "storge write '#{location}' (600)" }
+      Rails.logger.debug { "storge write '#{location}' (644)" }
       File.binwrite(location, data)
     end
 
+    # changed default 600 to 644 so nginx can access to files
     File.chmod(0o644, location)
 
     validate_file(sha)

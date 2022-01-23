@@ -77,7 +77,7 @@ returns
     # set webhook / callback url for this bot @ whatsapp
     # callback_url = "#{Setting.get('http_type')}://#{Setting.get('fqdn')}/api/v1/channels_whatsapp_webhook/#{callback_token}"
     callback_url = "https://zmd5.voipe.cc/api/v1/channels_whatsapp_webhook/#{callback_token}"
-    # callback_url = "https://ec81-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
+    # callback_url = "https://1c21-82-103-129-80.ngrok.io/api/v1/channels_whatsapp_webhook/#{callback_token}"
     if Whatsapp.set_webhook(api_token, callback_url)
       if !channel
         channel = Channel.new
@@ -368,7 +368,7 @@ returns
       #   body += "<br>#{photo[:caption].text2html}"
       # end
 
-      body  = '&nbsp;'
+      body = '&nbsp;'
       begin
         if photo[:caption]
           body += "<br>#{photo[:caption].text2html}"
@@ -409,7 +409,7 @@ returns
       document = params[:messages][0][:document]
       document_result = get_file(params, document, api_token)
 
-      body  = '&nbsp;'
+      body = '&nbsp;'
       begin
         if document[:caption]
           body += "#{document[:caption].text2html}"
@@ -479,12 +479,12 @@ returns
       voice = params[:messages][0][:voice]
 
       begin
-        body  = '&nbsp;'
+        body = '&nbsp;'
         if params[:messages][0][:caption]
           body = "<br>#{voice[:caption].text2html}"
         end
       rescue
-        body  = '&nbsp;'
+        body = '&nbsp;'
       end
 
       document_result      = get_file(params, voice, api_token)
@@ -493,11 +493,13 @@ returns
       article.save!
 
       type = 'mp3'
+      mime_type = voice[:mime_type]
       if voice[:mime_type] == 'audio/mpeg'
         type = 'mp3'
       end
       if voice[:mime_type] == 'audio/ogg; codecs=opus'
-        type = 'ogg'
+        type = 'mp3' # opus codec is converted to mp3
+        voice[:mime_type] = 'audio/mpeg'
       end
       if voice[:mime_type] == 'audio/vnd.wav'
         type = 'wav'
@@ -515,8 +517,8 @@ returns
       Store.remove(
         object: 'Ticket::Article',
         o_id:   article.id,
-        )
-      Store.add(
+      )
+      store = Store.add(
         object:      'Ticket::Article',
         o_id:        article.id,
         data:        document_result.body,
@@ -524,7 +526,18 @@ returns
         preferences: {
           'Mime-Type' => voice[:mime_type],
         },
-        )
+      )
+
+      # converting opus codec audio into mp3(mpeg codec)
+      if mime_type == 'audio/ogg; codecs=opus'
+        store_file = Store::File.find(store[:store_file_id])
+        sha = store_file[:sha]
+        file_path = "#{Store::Provider::File.get_location(sha)}"
+        system("ffmpeg -i #{file_path} -vn -ar 44100 -ac 2 -f mp3 #{file_path}.mp3")
+        system("mv #{file_path}.mp3 #{file_path}")
+        store.update!(size: File.stat(file_path).size)
+      end
+
       return article
     end
 
